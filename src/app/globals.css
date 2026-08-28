@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+/*
+  Палитра задана токенами из технического задания. Тёмная тема — не инверсия
+  светлой: у неё собственные значения, подобранные по контрасту, иначе
+  «критично» и «успешно» на тёмном фоне перестают различаться.
+*/
+@theme {
+  --font-sans: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --color-bg: #f4f5f7;
+  --color-card: #ffffff;
+  --color-ink: #16181d;
+  --color-ink-2: #4a5060;
+  --color-ink-3: #7c8496;
+  --color-line: #dfe2e8;
+  --color-line-2: #eceef2;
+  --color-accent: #1f3864;
+  --color-accent-ink: #1f3864;
+  --color-soft: #e8edf6;
+
+  --color-critical: #b4232a;
+  --color-warning: #b96a12;
+  --color-attention: #8a7413;
+  --color-success: #1c6b45;
+
+  --color-critical-soft: #fbecec;
+  --color-warning-soft: #fbf1e5;
+  --color-attention-soft: #faf6e3;
+  --color-success-soft: #e8f3ed;
+}
+
+@layer theme {
+  .dark {
+    --color-bg: #14161a;
+    --color-card: #1c1f25;
+    --color-ink: #e9ecf1;
+    --color-ink-2: #b2b9c6;
+    --color-ink-3: #858d9c;
+    --color-line: #2e333c;
+    --color-line-2: #262b33;
+    --color-accent: #9db6e0;
+    --color-accent-ink: #cfdcf1;
+    --color-soft: #23303f;
+
+    --color-critical: #e8757c;
+    --color-warning: #e0a55c;
+    --color-attention: #d3bd5a;
+    --color-success: #6cc39a;
+
+    --color-critical-soft: #341d20;
+    --color-warning-soft: #33261a;
+    --color-attention-soft: #302c1a;
+    --color-success-soft: #1a2f26;
+  }
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Числа в таблицах должны выстраиваться по разрядам, иначе колонку сумм
+   невозможно сравнивать взглядом. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Полоса прокрутки в плотном интерфейсе не должна отбирать место. */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+.thin-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
