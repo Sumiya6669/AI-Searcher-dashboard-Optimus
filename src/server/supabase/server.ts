@@ -1,6 +1,10 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+import { publicEnv, requireEnv } from '@/lib/env';
+
+export { requireEnv };
+
 /**
  * Клиент Supabase для серверного кода. Он подставляет сессию вошедшего
  * пользователя, поэтому каждый запрос уходит в базу от его имени, и права
@@ -33,22 +37,12 @@ export async function createSupabaseServerClient() {
   });
 }
 
-export function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(
-      `Не задана переменная окружения ${name}. Скопируйте .env.example в .env.local и заполните значения.`,
-    );
-  }
-  return value;
-}
-
 export function isDemoMode(): boolean {
   return process.env.DASHBOARD_DEMO === '1';
 }
 
 export function n8nBaseUrl(): string | null {
-  return process.env.NEXT_PUBLIC_N8N_BASE_URL || null;
+  return publicEnv('NEXT_PUBLIC_N8N_BASE_URL');
 }
 
 export function n8nExecutionUrl(workflowIdOrCode: string | null, executionId: string | null): string | null {
