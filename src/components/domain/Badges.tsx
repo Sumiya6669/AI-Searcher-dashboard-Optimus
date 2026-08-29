@@ -1,4 +1,5 @@
-import { Badge, Dot } from '@/components/ui/Badge';
+import { Badge, Dot, Meter } from '@/components/ui/Badge';
+import { cn } from '@/lib/cn';
 import {
   CRAWL_HEALTH,
   FRESHNESS,
@@ -12,11 +13,25 @@ import type { CrawlHealth, SourceFreshness, TenderUrgency } from '@/lib/types';
 
 export function SeverityBadge({ level, compact }: { level: number | null | undefined; compact?: boolean }) {
   const meta = severityMeta(level);
+  const title = `${meta.level} из 5 — ${meta.label.toLowerCase()}`;
   return (
-    <Badge tone={meta.tone} title={meta.label}>
-      <Dot tone={meta.tone} />
-      {compact ? `${meta.level}/5` : `${meta.level}/5 · ${meta.label.toLowerCase()}`}
-    </Badge>
+    <span className="inline-flex shrink-0 items-center gap-1.5" title={title}>
+      <Meter level={meta.level} tone={meta.tone} title={title} />
+      <span
+        className={cn(
+          'text-[11px] font-bold uppercase tracking-[0.05em]',
+          meta.tone === 'critical'
+            ? 'text-[var(--color-critical)]'
+            : meta.tone === 'warning'
+              ? 'text-[var(--color-warning)]'
+              : meta.tone === 'attention'
+                ? 'text-[var(--color-attention)]'
+                : 'text-[var(--color-ink-3)]',
+        )}
+      >
+        {compact ? meta.level : meta.short}
+      </span>
+    </span>
   );
 }
 

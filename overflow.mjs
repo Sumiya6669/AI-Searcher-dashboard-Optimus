@@ -1,12 +1,12 @@
 import { chromium } from 'playwright';
 const BASE = process.env.BASE ?? 'http://127.0.0.1:3116';
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell', args: ['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'] });
 const viewports = [
   ['mobile', 390, 844],
   ['tablet', 900, 1000],
   ['desktop', 1440, 950],
 ];
-const routes = ['/dashboard', '/events', '/events/201', '/competitors', '/competitors/4', '/brands', '/tenders', '/tenders/9001', '/sources', '/sources/telegram_channels', '/admin', '/settings'];
+const routes = ['/dashboard', '/events', '/events/201', '/competitors', '/competitors/4', '/brands', '/tenders', '/tenders/9001', '/admin/sources', '/admin/sources/telegram_channels', '/admin', '/admin/people', '/settings'];
 let issues = 0;
 for (const [label, w, h] of viewports) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h } });

@@ -13,7 +13,7 @@ import { formatNumber, formatPercent, formatRelative, truncate } from '@/lib/for
 import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
 import { fetchSourceStats } from '@/server/queries/sources';
 
-export const metadata: Metadata = { title: 'Источники' };
+export const metadata: Metadata = { title: 'Источники и сбор' };
 export const dynamic = 'force-dynamic';
 
 export default async function SourcesPage({ searchParams }: { searchParams: Promise<SearchParamsInput> }) {
@@ -38,7 +38,10 @@ export default async function SourcesPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Источники" subtitle="Откуда берётся материал и где охват просел" />
+      <PageHeader
+        title="Источники и сбор"
+        subtitle="Откуда берётся материал, что просело и что ещё не подключено"
+      />
       <FilterBar fields={fields} />
       <Suspense
         fallback={
@@ -61,7 +64,7 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
   if (!result.ok) {
     return (
       <Card>
-        <ErrorState message={result.error} retryHref="/sources" />
+        <ErrorState message={result.error} retryHref="/admin/sources" />
       </Card>
     );
   }
@@ -96,7 +99,7 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
           <tbody>
             {rows.map((source) => (
               <Tr key={source.code}>
-                <LinkCell href={`/sources/${source.code}`}>
+                <LinkCell href={`/admin/sources/${source.code}`}>
                   {source.name}
                   <span className="block text-[11.5px] font-normal text-[var(--color-ink-3)]">
                     {source.workflow_code ?? '—'}

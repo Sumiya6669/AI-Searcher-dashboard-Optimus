@@ -19,11 +19,14 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
-  const theme = cookieStore.get('theme')?.value ?? 'system';
-  const forcedDark = theme === 'dark';
+  // Тёмная тема — основная: интерфейс дежурного открыт весь рабочий день, и
+  // светлое полотно во весь экран утомляет быстрее. Выбор пользователя её
+  // перекрывает и хранится в cookie.
+  const theme = cookieStore.get('theme')?.value ?? 'dark';
+  const forcedLight = theme === 'light';
 
   return (
-    <html lang="ru" className={forcedDark ? 'dark' : undefined} suppressHydrationWarning>
+    <html lang="ru" className={forcedLight ? undefined : 'dark'} suppressHydrationWarning>
       <head>
         {/*
           Тема применяется до первой отрисовки. Иначе при выборе «как в системе»
@@ -31,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|; )theme=([^;]+)/);var p=m?decodeURIComponent(m[1]):'system';var d=p==='dark'||(p!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|; )theme=([^;]+)/);var p=m?decodeURIComponent(m[1]):'dark';var d=p==='dark'||(p!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){document.documentElement.classList.add('dark');}})();`,
           }}
         />
       </head>

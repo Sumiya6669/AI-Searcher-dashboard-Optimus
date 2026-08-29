@@ -1,58 +1,76 @@
 @import 'tailwindcss';
 
 /*
-  Палитра задана токенами из технического задания. Тёмная тема — не инверсия
-  светлой: у неё собственные значения, подобранные по контрасту, иначе
-  «критично» и «успешно» на тёмном фоне перестают различаться.
+  Оформление построено вокруг одной мысли: интерфейс дежурного, а не отчёт.
+  Фон уходит в тень, цвет остаётся только у того, что требует решения, — у
+  важности события и срочности лота. Всё остальное живёт на оттенках серого и
+  различается размером и весом, а не краской. Поэтому цветных пятен на экране
+  мало, и каждое из них что-то значит.
+
+  Тёмная тема — основная и не является инверсией светлой: у неё собственные
+  значения, подобранные по контрасту. Иначе «критично» и «успешно» на тёмном
+  фоне сближаются до неразличимости.
 */
 @theme {
-  --font-sans: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans:
+    ui-sans-serif, -apple-system, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  --color-bg: #f4f5f7;
+  /* Светлая тема */
+  --color-bg: #f6f7f9;
   --color-card: #ffffff;
-  --color-ink: #16181d;
-  --color-ink-2: #4a5060;
-  --color-ink-3: #7c8496;
-  --color-line: #dfe2e8;
-  --color-line-2: #eceef2;
-  --color-accent: #1f3864;
-  --color-accent-ink: #1f3864;
-  --color-soft: #e8edf6;
+  --color-raise: #fbfcfd;
+  --color-sidebar: #ffffff;
+  --color-ink: #0d1117;
+  --color-ink-2: #4b5566;
+  --color-ink-3: #7b8494;
+  --color-line: #e3e6ec;
+  --color-line-2: #eef0f4;
+  --color-accent: #2563eb;
+  --color-accent-ink: #1d4ed8;
+  --color-soft: #e8effd;
 
-  --color-critical: #b4232a;
-  --color-warning: #b96a12;
-  --color-attention: #8a7413;
-  --color-success: #1c6b45;
+  --color-critical: #d02233;
+  --color-warning: #b45c09;
+  --color-attention: #8a6d0b;
+  --color-success: #0f7a4d;
 
-  --color-critical-soft: #fbecec;
-  --color-warning-soft: #fbf1e5;
-  --color-attention-soft: #faf6e3;
-  --color-success-soft: #e8f3ed;
+  --color-critical-soft: #fdecee;
+  --color-warning-soft: #fdf0e3;
+  --color-attention-soft: #fbf6e1;
+  --color-success-soft: #e6f5ee;
+
+  --shadow-card: 0 1px 2px rgb(13 17 23 / 6%);
+  --shadow-pop: 0 8px 24px -6px rgb(13 17 23 / 14%);
 }
 
 @layer theme {
   .dark {
-    --color-bg: #14161a;
-    --color-card: #1c1f25;
-    --color-ink: #e9ecf1;
-    --color-ink-2: #b2b9c6;
-    --color-ink-3: #858d9c;
-    --color-line: #2e333c;
-    --color-line-2: #262b33;
-    --color-accent: #9db6e0;
-    --color-accent-ink: #cfdcf1;
-    --color-soft: #23303f;
+    --color-bg: #0a0c10;
+    --color-card: #101319;
+    --color-raise: #151922;
+    --color-sidebar: #0c0f14;
+    --color-ink: #e8edf5;
+    --color-ink-2: #98a3b5;
+    --color-ink-3: #69738a;
+    --color-line: #1e2430;
+    --color-line-2: #171c25;
+    --color-accent: #4d8dff;
+    --color-accent-ink: #85b0ff;
+    --color-soft: #14203a;
 
-    --color-critical: #e8757c;
-    --color-warning: #e0a55c;
-    --color-attention: #d3bd5a;
-    --color-success: #6cc39a;
+    --color-critical: #ff5f6d;
+    --color-warning: #ff9f38;
+    --color-attention: #ecc94b;
+    --color-success: #2fd08a;
 
-    --color-critical-soft: #341d20;
-    --color-warning-soft: #33261a;
-    --color-attention-soft: #302c1a;
-    --color-success-soft: #1a2f26;
+    --color-critical-soft: #2a1015;
+    --color-warning-soft: #2a1a0d;
+    --color-attention-soft: #262009;
+    --color-success-soft: #06231a;
+
+    --shadow-card: 0 1px 0 rgb(255 255 255 / 3%) inset;
+    --shadow-pop: 0 16px 40px -12px rgb(0 0 0 / 70%);
   }
 }
 
@@ -85,10 +103,28 @@ body {
   font-feature-settings: 'tnum';
 }
 
+/* Крупные показатели набираются узкими цифрами: пять чисел в ряд должны
+   помещаться на ноутбуке, не уезжая в перенос. */
+.figure {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Надпись-ярлык над показателем. Повторялась в десятке мест — вынесена сюда,
+   чтобы размер и разрядка не разъезжались от карточки к карточке. */
+.eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 /* Полоса прокрутки в плотном интерфейсе не должна отбирать место. */

@@ -128,7 +128,7 @@ function buildItems(
         title: s.name,
         detail: s.freshness === 'error' ? 'запуски падают' : 'данные устарели',
         at: s.last_activity_at,
-        href: `/sources/${s.code}`,
+        href: `/admin/sources/${s.code}`,
       });
     }
   }

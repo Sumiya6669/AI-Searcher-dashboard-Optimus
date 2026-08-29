@@ -7,7 +7,12 @@ export function Card({ className, children }: { className?: string; children: Re
     // min-w-0 обязателен: элемент сетки по умолчанию не сжимается ниже
     // ширины содержимого, и широкая таблица внутри растягивала бы страницу
     // вместо того чтобы прокручиваться внутри карточки.
-    <section className={cn('min-w-0 overflow-hidden rounded-lg border border-[var(--color-line)] bg-[var(--color-card)]', className)}>
+    <section
+      className={cn(
+        'min-w-0 overflow-hidden rounded-xl border border-[var(--color-line)] bg-[var(--color-card)] shadow-[var(--shadow-card)]',
+        className,
+      )}
+    >
       {children}
     </section>
   );
@@ -25,9 +30,13 @@ export function CardHead({
   as?: 'h2' | 'h3';
 }) {
   return (
-    <header className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-[var(--color-line-2)] px-4 py-3">
-      <Tag className="min-w-0 text-[15px] font-semibold text-[var(--color-ink)]">{title}</Tag>
-      {hint ? <p className="order-last w-full text-xs text-[var(--color-ink-3)] sm:order-none sm:w-auto">{hint}</p> : null}
+    <header className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-[var(--color-line-2)] px-4 py-2.5">
+      <Tag className="min-w-0 text-[14px] font-semibold tracking-[-0.01em] text-[var(--color-ink)]">{title}</Tag>
+      {hint ? (
+        <p className="order-last w-full min-w-0 truncate text-[11.5px] text-[var(--color-ink-3)] sm:order-none sm:w-auto sm:flex-1">
+          {hint}
+        </p>
+      ) : null}
       {actions ? <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>
   );
@@ -47,10 +56,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="text-xl font-semibold tracking-[-0.01em] text-[var(--color-ink)]">{title}</h1>
-        {subtitle ? <p className="mt-0.5 text-[13px] text-[var(--color-ink-2)]">{subtitle}</p> : null}
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0">
+        <h1 className="text-[22px] font-semibold leading-tight tracking-[-0.02em] text-[var(--color-ink)]">{title}</h1>
+        {subtitle ? <p className="mt-1 text-[13px] text-[var(--color-ink-3)]">{subtitle}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>
@@ -59,7 +68,7 @@ export function PageHeader({
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h3 className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-[var(--color-ink-3)]">{children}</h3>
+    <h3 className="eyebrow mb-2">{children}</h3>
   );
 }
 

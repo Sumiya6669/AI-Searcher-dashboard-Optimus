@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { SentimentBadge, SeverityBadge } from './Badges';
 import { EmptyState } from '@/components/ui/States';
+import { cn } from '@/lib/cn';
 import { formatShort, hostOf, truncate } from '@/lib/format';
 import type { EventListRow } from '@/lib/types';
 
@@ -13,9 +14,23 @@ import type { EventListRow } from '@/lib/types';
  */
 export function EventCard({ event }: { event: EventListRow }) {
   const focus = event.product_focus ?? event.company_focus;
+  // Полоса слева зажигается только на важности 4 и 5. Красить каждую строку
+  // означало бы получить радугу, в которой критичное перестаёт выделяться:
+  // выделение работает, только пока выделено меньшинство.
+  const rail =
+    event.importance >= 5
+      ? 'border-l-[var(--color-critical)]'
+      : event.importance === 4
+        ? 'border-l-[var(--color-warning)]'
+        : 'border-l-transparent';
 
   return (
-    <article className="border-b border-[var(--color-line-2)] px-4 py-3 last:border-b-0">
+    <article
+      className={cn(
+        'border-b border-l-2 border-b-[var(--color-line-2)] px-4 py-3 transition-colors last:border-b-0 hover:bg-[var(--color-raise)]',
+        rail,
+      )}
+    >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[var(--color-ink-3)]">
         {event.link ? (
           <a

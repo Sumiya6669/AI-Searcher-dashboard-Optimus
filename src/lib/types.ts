@@ -343,6 +343,45 @@ export interface RecipientRow {
   is_active: boolean;
 }
 
+export interface AdminUserRow {
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  role: AppRole;
+  is_active: boolean;
+  created_at: string;
+  last_sign_in_at: string | null;
+  group_ids: number[];
+  group_names: string;
+}
+
+export interface AccessGroupRow {
+  id: number;
+  code: string;
+  name: string;
+  description: string | null;
+  /** Ограничивать не только рассылку, но и просмотр разделов. */
+  restrict_view: boolean;
+  min_importance: number;
+  recipient_id: number | null;
+  recipient_name: string | null;
+  is_active: boolean;
+  entity_ids: number[];
+  entity_names: string;
+  member_ids: string[];
+  members_count: number;
+  events_30d: number;
+}
+
+export interface EntityOptionRow {
+  id: number;
+  canonical_name: string;
+  entity_type: string;
+  product_group: string | null;
+  is_active: boolean;
+  events_30d: number;
+}
+
 /** Обёртка результата: ошибка одного блока не должна ломать страницу. */
 export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
 

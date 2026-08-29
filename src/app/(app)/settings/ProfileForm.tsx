@@ -23,19 +23,11 @@ export function ProfileForm({ user }: { user: AppUser }) {
         />
       </label>
 
-      <label className="block">
-        <span className="mb-1 block text-[12.5px] font-medium text-[var(--color-ink-2)]">Часовой пояс</span>
-        <select
-          name="timezone"
-          defaultValue={user.timezone}
-          className="h-9 w-full max-w-sm rounded-md border border-[var(--color-line)] bg-[var(--color-card)] px-2 text-[14px]"
-        >
-          <option value="Asia/Almaty">Asia/Almaty — UTC+5</option>
-          <option value="Asia/Qyzylorda">Asia/Qyzylorda — UTC+5</option>
-          <option value="Europe/Moscow">Europe/Moscow — UTC+3</option>
-          <option value="UTC">UTC</option>
-        </select>
-      </label>
+      {/*
+        Выбора часового пояса здесь нет сознательно. Сроки приёма заявок по
+        лотам живут во времени Казахстана, и «осталось 19 часов» должно
+        означать одно и то же для сотрудника в офисе и в командировке.
+      */}
 
       <label className="block">
         <span className="mb-1 block text-[12.5px] font-medium text-[var(--color-ink-2)]">Язык интерфейса</span>

@@ -36,7 +36,7 @@ export default async function SourcePage({
   if (!result.ok) {
     return (
       <Card>
-        <ErrorState message={result.error} retryHref={`/sources/${code}`} />
+        <ErrorState message={result.error} retryHref={`/admin/sources/${code}`} />
       </Card>
     );
   }
@@ -51,7 +51,7 @@ export default async function SourcePage({
   return (
     <>
       <Link
-        href="/sources"
+        href="/admin/sources"
         className="mb-3 inline-flex items-center gap-1 text-[12.5px] text-[var(--color-ink-2)] hover:text-[var(--color-ink)]"
       >
         <ArrowLeft size={13} />
@@ -137,7 +137,7 @@ export default async function SourcePage({
             <Card>
               <CardHead title="Наблюдаемые аккаунты" hint={`активных: ${source.accounts_active}`} />
               {!accounts.ok ? (
-                <ErrorState message={accounts.error} retryHref={`/sources/${code}`} />
+                <ErrorState message={accounts.error} retryHref={`/admin/sources/${code}`} />
               ) : accounts.data.length === 0 ? (
                 <EmptyState
                   title="Аккаунты не заведены"
@@ -216,7 +216,7 @@ export default async function SourcePage({
         <Card>
           <CardHead title="Последние события источника" />
           {!events.ok ? (
-            <ErrorState message={events.error} retryHref={`/sources/${code}`} />
+            <ErrorState message={events.error} retryHref={`/admin/sources/${code}`} />
           ) : (
             <EventFeed events={events.data.rows} />
           )}

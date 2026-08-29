@@ -8,7 +8,6 @@ import { Card, CardBody, CardHead, DefinitionList, PageHeader } from '@/componen
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { TableWrap, Td, Th, Tr } from '@/components/ui/Table';
 import { ENTITY_TYPE_LABEL } from '@/lib/domain';
-import { APP_TIMEZONE } from '@/lib/format';
 import { requireUser } from '@/server/auth';
 import { fetchSubscriptions } from '@/server/queries/brands';
 import { fetchDeliveryState } from '@/server/queries/admin';
@@ -71,8 +70,8 @@ export default async function SettingsPage() {
               применяется до первой отрисовки, поэтому страница не мигает при загрузке.
             </p>
             <p>
-              Всё время в интерфейсе показывается в поясе <strong className="text-[var(--color-ink)]">{APP_TIMEZONE}</strong>{' '}
-              (UTC+5) — том же, в котором работают сценарии сбора. Даты — в виде 28.08.2026 14:20, суммы — 4 820 000 ₸.
+              Всё время в интерфейсе — время Казахстана; текущее видно в шапке и в боковом меню. Даты записываются как
+              28.08.2026 14:20, суммы — как 4 820 000 ₸.
             </p>
           </CardBody>
         </Card>

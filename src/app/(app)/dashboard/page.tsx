@@ -4,17 +4,17 @@ import { Suspense } from 'react';
 
 import { EventFeed } from '@/components/domain/EventFeed';
 import { KpiRow } from '@/components/domain/KpiCard';
-import { FreshnessBadge, UrgencyBadge } from '@/components/domain/Badges';
+import { UrgencyBadge } from '@/components/domain/Badges';
+import { Bar } from '@/components/ui/Badge';
 import { Card, CardHead, PageHeader } from '@/components/ui/Card';
-import { DeniedNotice, ErrorState, KpiSkeleton, LoadingSkeleton, StaleNotice } from '@/components/ui/States';
+import { DeniedNotice, ErrorState, KpiSkeleton, LoadingSkeleton } from '@/components/ui/States';
 import { Td, TableWrap, Th, Tr, LinkCell } from '@/components/ui/Table';
-import { DEFAULT_PERIOD_DAYS } from '@/lib/domain';
-import { formatHoursLeft, formatMoneyKzt, formatNumber, formatPercent, formatRelative, formatShort } from '@/lib/format';
+import { formatHoursLeft, formatMoneyKzt, formatNumber, formatPercent, formatShort } from '@/lib/format';
 import { readInt, type SearchParamsInput } from '@/lib/url';
 import { requireUser } from '@/server/auth';
 import { fetchKpi } from '@/server/queries/dashboard';
+import { fetchBrandStats } from '@/server/queries/brands';
 import { fetchEvents } from '@/server/queries/events';
-import { fetchSourceStats } from '@/server/queries/sources';
 import { fetchTenders } from '@/server/queries/tenders';
 import { fetchCompetitorActivity } from '@/server/queries/competitors';
 
@@ -27,7 +27,9 @@ export default async function DashboardPage({
   searchParams: Promise<SearchParamsInput>;
 }) {
   const params = await searchParams;
-  const user = await requireUser();
+  // Профиль читается, чтобы страница не открылась без выданного доступа:
+  // requireUser уводит на /login и /no-access.
+  await requireUser();
   const periodDays = readInt(params, 'period', 1);
   const denied = params.denied === 'admin';
 
@@ -50,7 +52,9 @@ export default async function DashboardPage({
           <KpiBlock periodDays={periodDays} />
         </Suspense>
 
-        <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        {/* items-start: без него левая карточка растягивается до высоты правой
+            колонки и под лентой событий повисает пустое полотно. */}
+        <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
           <Card>
             <CardHead
               title="Лента событий"
@@ -74,7 +78,7 @@ export default async function DashboardPage({
               <CompetitorMovers periodDays={periodDays === 1 ? 7 : periodDays} />
             </Suspense>
             <Suspense fallback={<LoadingSkeleton rows={4} />}>
-              <SourceHealth isAdmin={user.role === 'admin'} />
+              <BrandVoice periodDays={periodDays === 1 ? 7 : periodDays} />
             </Suspense>
           </div>
         </div>
@@ -125,15 +129,9 @@ async function KpiBlock({ periodDays }: { periodDays: number }) {
       </Card>
     );
   }
+  // Состояние сбора на этот экран не выносится: «89 % успешных запусков» —
+  // вопрос дежурного, а не менеджера по продажам, и живёт в администрировании.
   const kpi = result.data;
-  const successTone =
-    kpi.collect_success_pct === null
-      ? 'neutral'
-      : kpi.collect_success_pct >= 90
-        ? 'success'
-        : kpi.collect_success_pct >= 75
-          ? 'warning'
-          : 'critical';
 
   return (
     <KpiRow
@@ -162,13 +160,6 @@ async function KpiBlock({ periodDays }: { periodDays: number }) {
           value: formatNumber(kpi.competitor_changes),
           hint: 'за всё время наблюдения',
           href: '/competitors',
-        },
-        {
-          label: 'Состояние сбора',
-          value: formatPercent(kpi.collect_success_pct),
-          hint: `${formatNumber(kpi.runs_ok_24h)} из ${formatNumber(kpi.runs_total_24h)} запусков за сутки`,
-          tone: successTone,
-          href: '/sources',
         },
       ]}
     />
@@ -201,7 +192,6 @@ async function UrgentTenders() {
     <Card>
       <CardHead
         title="Закупки: что закрывается первым"
-        hint="порядок по сроку приёма заявок"
         actions={
           <Link href="/tenders" className="text-[12.5px] text-[var(--color-accent-ink)] hover:underline">
             все лоты
@@ -256,7 +246,6 @@ async function CompetitorMovers({ periodDays }: { periodDays: number }) {
     <Card>
       <CardHead
         title="Кто из конкурентов активизировался"
-        hint={`за ${periodDays} дней`}
         actions={
           <Link href="/competitors" className="text-[12.5px] text-[var(--color-accent-ink)] hover:underline">
             все конкуренты
@@ -291,62 +280,70 @@ async function CompetitorMovers({ periodDays }: { periodDays: number }) {
   );
 }
 
-async function SourceHealth({ isAdmin }: { isAdmin: boolean }) {
-  const result = await fetchSourceStats(DEFAULT_PERIOD_DAYS);
+/**
+ * Раздел про рынок, а не про систему: по каким брендам сейчас говорят и с
+ * каким настроением. На месте прежнего «Всё ли работает» — тот блок переехал
+ * в администрирование целиком.
+ */
+async function BrandVoice({ periodDays }: { periodDays: number }) {
+  const result = await fetchBrandStats(periodDays);
   if (!result.ok) {
     return (
       <Card>
-        <CardHead title="Всё ли работает" />
+        <CardHead title="О чём говорит рынок" />
         <ErrorState message={result.error} retryHref="/dashboard" />
       </Card>
     );
   }
-  const rows = result.data;
-  const problems = rows.filter((s) => s.freshness === 'error' || s.freshness === 'stale');
+  const rows = [...result.data].sort((a, b) => b.events_count - a.events_count).slice(0, 6);
 
   return (
     <Card>
       <CardHead
-        title="Всё ли работает"
-        hint="источники и их свежесть"
+        title="О чём говорит рынок"
         actions={
-          <Link href={isAdmin ? '/admin' : '/sources'} className="text-[12.5px] text-[var(--color-accent-ink)] hover:underline">
-            {isAdmin ? 'состояние системы' : 'все источники'}
+          <Link href="/brands" className="text-[12.5px] text-[var(--color-accent-ink)] hover:underline">
+            все бренды
           </Link>
         }
       />
-      {problems.length > 0 ? (
-        <StaleNotice>
-          {problems.length === 1
-            ? `Источник «${problems[0]?.name}» требует внимания.`
-            : `Источников с отклонениями: ${problems.length}.`}
-        </StaleNotice>
-      ) : null}
-      <TableWrap>
-        <thead>
-          <tr>
-            <Th>Источник</Th>
-            <Th numeric>Материалов</Th>
-            <Th>Состояние</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((source) => (
-            <Tr key={source.code}>
-              <LinkCell href={`/sources/${source.code}`}>
-                {source.name}
-                <span className="block text-[11.5px] font-normal text-[var(--color-ink-3)]">
-                  {source.last_activity_at ? `активность ${formatRelative(source.last_activity_at)}` : 'активности не было'}
-                </span>
-              </LinkCell>
-              <Td numeric>{formatNumber(source.materials_total)}</Td>
-              <Td>
-                <FreshnessBadge freshness={source.freshness} />
-              </Td>
-            </Tr>
-          ))}
-        </tbody>
-      </TableWrap>
+      {rows.length === 0 ? (
+        <p className="px-4 py-6 text-center text-[13px] text-[var(--color-ink-2)]">
+          За период по брендам ничего не собрано.
+        </p>
+      ) : (
+        <TableWrap>
+          <thead>
+            <tr>
+              <Th>Бренд или направление</Th>
+              <Th numeric>Событий</Th>
+              <Th width="38%">Доля потока</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <Tr key={row.entity_id}>
+                <LinkCell href={`/brands/${row.entity_id}`}>
+                  {row.canonical_name}
+                  <span className="block text-[11.5px] font-normal text-[var(--color-ink-3)]">
+                    {row.events_high > 0 ? `важных ${formatNumber(row.events_high)}` : 'важных нет'}
+                    {row.negative > 0 ? ` · отрицательных ${formatNumber(row.negative)}` : ''}
+                  </span>
+                </LinkCell>
+                <Td numeric>{formatNumber(row.events_count)}</Td>
+                <Td>
+                  <span className="flex items-center gap-2">
+                    <Bar value={row.share_pct} tone="accent" />
+                    <span className="tabular w-9 shrink-0 text-right text-[12px] text-[var(--color-ink-3)]">
+                      {formatPercent(row.share_pct)}
+                    </span>
+                  </span>
+                </Td>
+              </Tr>
+            ))}
+          </tbody>
+        </TableWrap>
+      )}
     </Card>
   );
 }

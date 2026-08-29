@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { Clock } from '@/components/layout/Clock';
 import { Header } from '@/components/layout/Header';
 import { SidebarBrand, SidebarNav } from '@/components/layout/Sidebar';
 import { requireUser } from '@/server/auth';
@@ -11,16 +12,15 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-dvh bg-[var(--color-bg)]">
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-[var(--color-line)] bg-[var(--color-card)] lg:flex">
+      <aside className="sticky top-0 hidden h-dvh w-[236px] shrink-0 flex-col border-r border-[var(--color-line)] bg-[var(--color-sidebar)] lg:flex">
         <SidebarBrand />
         <div className="thin-scroll flex-1 overflow-y-auto">
           <SidebarNav role={user.role} />
         </div>
-        <p className="border-t border-[var(--color-line)] px-4 py-2.5 text-[11px] leading-4 text-[var(--color-ink-3)]">
-          Время местное, UTC+5.
-          <br />
-          Сбор данных идёт в n8n.
-        </p>
+        <div className="border-t border-[var(--color-line)] px-4 py-3">
+          <p className="eyebrow mb-1">Время Казахстана</p>
+          <Clock />
+        </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -29,7 +29,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           notifications={attention.ok ? attention.data : []}
           generatedAt={new Date().toISOString()}
         />
-        <main className="w-full min-w-0 max-w-full flex-1 overflow-x-hidden px-3 py-4 lg:px-6 lg:py-5">{children}</main>
+        <main className="mx-auto w-full min-w-0 max-w-[1560px] flex-1 overflow-x-hidden px-3 py-5 lg:px-6 lg:py-6">
+          {children}
+        </main>
       </div>
     </div>
   );

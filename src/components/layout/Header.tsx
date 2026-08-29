@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
+import { Clock } from './Clock';
 import { GlobalSearch } from './GlobalSearch';
 import { NotificationCenter, type NotificationItem } from './NotificationCenter';
 import { SidebarBrand, SidebarNav } from './Sidebar';
@@ -29,7 +30,7 @@ export function Header({
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-[var(--color-line)] bg-[var(--color-card)] px-3 lg:px-4">
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-[var(--color-line)] bg-[var(--color-card)]/90 px-3 backdrop-blur lg:px-5">
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
@@ -43,9 +44,15 @@ export function Header({
           <GlobalSearch />
         </div>
 
-        <span className="hidden text-[11.5px] text-[var(--color-ink-3)] xl:inline" title="Время последнего чтения данных">
-          обновлено {formatRelative(generatedAt)}
-        </span>
+        <div className="hidden items-center gap-3 pr-1 md:flex">
+          <Clock />
+          <span
+            className="hidden border-l border-[var(--color-line)] pl-3 text-[11.5px] text-[var(--color-ink-3)] xl:inline"
+            title="Время последнего чтения данных"
+          >
+            обновлено {formatRelative(generatedAt)}
+          </span>
+        </div>
 
         <button
           type="button"

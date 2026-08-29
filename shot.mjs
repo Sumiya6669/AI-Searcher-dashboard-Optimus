@@ -1,39 +1,64 @@
+import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+
 const BASE = process.env.BASE ?? 'http://127.0.0.1:3114';
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
-async function shoot(name, path, opts) {
+const OUT = process.env.OUT ?? 'shots';
+mkdirSync(OUT, { recursive: true });
+
+const browser = await chromium.launch({
+  executablePath:
+    process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell',
+  args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+});
+
+async function shoot(name, path, opts = {}) {
   const ctx = await browser.newContext({
-    viewport: opts.viewport,
+    viewport: opts.viewport ?? { width: 1440, height: 950 },
     colorScheme: opts.dark ? 'dark' : 'light',
     deviceScaleFactor: 1,
   });
+  // Тема хранится в cookie и применяется на сервере, поэтому системная
+  // настройка браузера сама по себе светлую тему не включит.
+  await ctx.addCookies([
+    { name: 'theme', value: opts.dark ? 'dark' : 'light', url: BASE },
+  ]);
   const page = await ctx.newPage();
   const errors = [];
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(m.text());
+  });
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(400);
-  await page.screenshot({ path: `shots/${name}.png`, fullPage: opts.full ?? false });
-  if (errors.length) console.log(`  console errors on ${path}:`, errors.slice(0, 3));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: opts.full ?? false });
+  if (errors.length) console.log(`  ошибки консоли на ${path}: ${errors.slice(0, 3).join(' | ')}`);
   await ctx.close();
 }
-import { mkdirSync } from 'fs';
-mkdirSync('shots', { recursive: true });
-const desktop = { width: 1440, height: 950 };
-const tablet = { width: 900, height: 1000 };
+
 const mobile = { width: 390, height: 844 };
-await shoot('01-dashboard-light', '/dashboard', { viewport: desktop });
-await shoot('02-dashboard-dark', '/dashboard', { viewport: desktop, dark: true });
-await shoot('03-events', '/events', { viewport: desktop });
-await shoot('04-event-detail', '/events/201', { viewport: desktop });
-await shoot('05-tenders', '/tenders', { viewport: desktop });
-await shoot('06-competitors', '/competitors', { viewport: desktop });
-await shoot('07-brands', '/brands', { viewport: desktop });
-await shoot('08-sources', '/sources', { viewport: desktop });
-await shoot('09-admin-dark', '/admin', { viewport: desktop, dark: true, full: true });
-await shoot('10-settings', '/settings', { viewport: desktop });
-await shoot('11-mobile-dashboard', '/dashboard', { viewport: mobile });
-await shoot('12-tablet-tenders', '/tenders', { viewport: tablet });
-await shoot('13-login', '/login', { viewport: desktop });
+
+const ROUTES = [
+  ['dashboard', '/dashboard'],
+  ['events', '/events'],
+  ['event-detail', '/events/201'],
+  ['tenders', '/tenders'],
+  ['competitors', '/competitors'],
+  ['brands', '/brands'],
+  ['sources', '/admin/sources'],
+  ['admin', '/admin'],
+  ['people', '/admin/people'],
+  ['settings', '/settings'],
+];
+
+for (const [name, path] of ROUTES) {
+  await shoot(`${name}-dark`, path, { dark: true, full: true });
+}
+await shoot('dashboard-light', '/dashboard', { full: true });
+await shoot('events-light', '/events', { full: true });
+await shoot('admin-light', '/admin', { full: true });
+await shoot('mobile-dashboard', '/dashboard', { viewport: mobile, dark: true, full: true });
+await shoot('mobile-events', '/events', { viewport: mobile, dark: true, full: true });
+await shoot('login', '/login', { dark: true });
+
 await browser.close();
-console.log('shots done');
+console.log('снимки готовы');
