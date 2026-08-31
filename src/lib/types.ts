@@ -382,6 +382,39 @@ export interface EntityOptionRow {
   events_30d: number;
 }
 
+/** Решение по строке каталога источников. Описание строки — в src/data. */
+export type CatalogStatus = 'not_connected' | 'in_progress' | 'connected' | 'rejected';
+
+export interface CatalogStateRow {
+  ord: number;
+  status: CatalogStatus;
+  source_id: number | null;
+  source_code: string | null;
+  note: string | null;
+  updated_at: string;
+}
+
+export interface SourceOptionRow {
+  id: number;
+  code: string;
+  name: string;
+  kind: string;
+  is_active: boolean;
+}
+
+/**
+ * Состояние внешнего подключения. Значение ключа сюда не приходит и прийти не
+ * может: база отдаёт только признак «заполнено» и длину.
+ */
+export interface IntegrationRow {
+  code: string;
+  title: string;
+  hint: string;
+  filled: boolean;
+  value_length: number;
+  editable: boolean;
+}
+
 /** Обёртка результата: ошибка одного блока не должна ломать страницу. */
 export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
 

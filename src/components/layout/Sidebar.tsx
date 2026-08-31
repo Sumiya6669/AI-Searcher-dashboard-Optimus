@@ -1,6 +1,18 @@
 'use client';
 
-import { Building2, Gauge, Gavel, Newspaper, Radio, Settings, ShieldCheck, Tags, Users } from 'lucide-react';
+import {
+  Building2,
+  Gauge,
+  Gavel,
+  KeyRound,
+  Library,
+  Newspaper,
+  Radio,
+  Settings,
+  ShieldCheck,
+  Tags,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -46,6 +58,8 @@ export const NAV: NavGroup[] = [
     items: [
       { href: '/admin', label: 'Состояние системы', icon: ShieldCheck, adminOnly: true },
       { href: '/admin/sources', label: 'Источники и сбор', icon: Radio, adminOnly: true },
+      { href: '/admin/catalog', label: 'Каталог источников', icon: Library, adminOnly: true },
+      { href: '/admin/integrations', label: 'Интеграции', icon: KeyRound, adminOnly: true },
       { href: '/admin/people', label: 'Люди и группы', icon: Users, adminOnly: true },
       { href: '/settings', label: 'Мой профиль', icon: Settings },
     ],
