@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { Answer } from './Answer';
 import { ChatForm } from './ChatForm';
+import { Sources } from './Sources';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardBody, PageHeader } from '@/components/ui/Card';
 import { EmptyState, ErrorState } from '@/components/ui/States';
@@ -97,7 +98,10 @@ export default async function ChatPage() {
                   </div>
 
                   {row.status === 'answered' && row.answer ? (
-                    <Answer text={row.answer} />
+                    <>
+                      <Answer text={row.answer} />
+                      <Sources sources={row.sources ?? {}} />
+                    </>
                   ) : (
                     <p className="text-[13px] leading-6 text-[var(--color-ink-3)]">
                       {row.error ?? STATUS_TEXT[row.status] ?? row.status}

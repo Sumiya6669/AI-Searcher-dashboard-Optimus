@@ -15,7 +15,7 @@ export async function fetchChatHistory(limit = 30): Promise<Result<ChatMessageRo
     const { data, error } = await supabase
       .from('chat_messages')
       .select(
-        'id, user_id, question, answer, status, error, found_events, found_tenders, cost_usd, asked_at, answered_at',
+        'id, user_id, question, answer, status, error, found_events, found_tenders, cost_usd, sources, asked_at, answered_at',
       )
       .order('id', { ascending: false })
       .limit(limit);

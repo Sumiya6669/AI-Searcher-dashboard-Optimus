@@ -151,6 +151,19 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
               <DefinitionList
                 items={[
                   { term: 'Источник', value: tenderSourceLabel(tender.source) },
+                  // Тот же лот часто приходит и вторым путём: tenderbot собирает
+                  // goszakup наравне с остальными площадками. Копия в списки не
+                  // попадает, но знать о ней полезно — это признак, что оба
+                  // канала живы, а не что один из них лот пропустил.
+                  {
+                    term: 'Тот же лот пришёл также',
+                    value: tender.also_sources
+                      ? tender.also_sources
+                          .split(', ')
+                          .map((code) => tenderSourceLabel(code))
+                          .join(', ')
+                      : 'только из одного источника',
+                  },
                   { term: 'Карточка получена', value: tender.enriched ? 'да' : 'нет' },
                   { term: 'Оповещение', value: tender.is_notified ? 'отправлено' : 'не отправлялось' },
                   { term: 'Напоминание', value: tender.reminder_sent ? 'отправлено' : 'не отправлялось' },

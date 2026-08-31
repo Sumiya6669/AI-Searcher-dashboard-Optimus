@@ -152,6 +152,12 @@ export interface TenderCardRow {
    */
   trade_method_name: string | null;
   kato_name: string | null;
+  /**
+   * Через какие ещё источники пришёл тот же лот. Копии в списки не попадают —
+   * их отсекает представление, — но молчать о них нельзя: выглядело бы так,
+   * будто второй источник этот лот не нашёл.
+   */
+  also_sources: string | null;
   portal_status: string | null;
   amount: number | null;
   qty: number | null;
@@ -447,6 +453,59 @@ export interface IntegrationRow {
  */
 export type ChatStatus = 'pending' | 'answered' | 'failed' | 'empty';
 
+/**
+ * Событие и лот в том виде, в каком они попали в ответ. Ссылки берутся
+ * отсюда, а не из текста модели: адрес, который модель придумала, ведёт в
+ * никуда, и проверить это можно только кликнув.
+ */
+export interface ChatEventSource {
+  event_id: number;
+  event_date: string;
+  category: string | null;
+  importance: number;
+  sentiment: string | null;
+  title: string;
+  vyzhimka: string | null;
+  entity_names: string | null;
+  product_groups: string | null;
+  source_name: string | null;
+  source_kind: string | null;
+  link: string | null;
+}
+
+export interface ChatTenderSource {
+  tender_id: number;
+  lot_no: string | null;
+  announce_no: string | null;
+  title: string;
+  customer_name: string | null;
+  customer_bin: string | null;
+  organizer_name: string | null;
+  trade_method_name: string | null;
+  amount: number | null;
+  qty: number | null;
+  unit: string | null;
+  ktru_code: string | null;
+  kato_name: string | null;
+  delivery_place: string | null;
+  published_at: string | null;
+  apply_to: string | null;
+  hours_left: number | null;
+  urgency: TenderUrgency;
+  importance: number;
+  match_reason: string | null;
+  matched_on: string | null;
+  entity_names: string | null;
+  portal_status: string | null;
+  source: string;
+  link: string | null;
+}
+
+export interface ChatSources {
+  events?: ChatEventSource[];
+  tenders?: ChatTenderSource[];
+}
+
 export interface ChatMessageRow {
   id: number;
   user_id: string;
@@ -457,6 +516,8 @@ export interface ChatMessageRow {
   found_events: number;
   found_tenders: number;
   cost_usd: number | null;
+  /** Снимок материала, по которому дан ответ. Пересчитать его нельзя. */
+  sources: ChatSources;
   asked_at: string;
   answered_at: string | null;
 }
@@ -470,8 +531,8 @@ export interface ChatMaterial {
   days: number;
   obshchiy_otvet: boolean;
   sushchnostey_naydeno: number;
-  events: unknown[];
-  tenders: unknown[];
+  events: ChatEventSource[];
+  tenders: ChatTenderSource[];
   events_count: number;
   tenders_count: number;
 }

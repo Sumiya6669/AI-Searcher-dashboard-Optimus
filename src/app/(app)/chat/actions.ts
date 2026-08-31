@@ -150,6 +150,13 @@ export async function askChat(_prev: ChatState, form: FormData): Promise<ChatSta
       status: 'answered',
       found_events: foundEvents,
       found_tenders: foundTenders,
+      // Материал хранится вместе с ответом. Перечитать его заново нельзя:
+      // лоты закрываются, события уходят за окно периода, и через неделю тот
+      // же отбор дал бы другой набор — а ответ остался бы тем же.
+      sources: {
+        events: Array.isArray(material?.events) ? material.events : [],
+        tenders: Array.isArray(material?.tenders) ? material.tenders : [],
+      },
       cost_usd: Number(payload.cost_usd ?? 0) || null,
       answered_at: new Date().toISOString(),
     })
