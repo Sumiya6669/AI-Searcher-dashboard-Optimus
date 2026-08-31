@@ -382,6 +382,24 @@ export interface EntityOptionRow {
   events_30d: number;
 }
 
+/**
+ * Направление семантики: объект или работа, под которые подходит номенклатура.
+ * Считается в базе, потому что число выражений и число событий должны быть
+ * одним и тем же числом и на экране, и на входном фильтре.
+ */
+export interface SemanticsRow {
+  entity_id: number;
+  canonical_name: string;
+  description: string | null;
+  product_groups: string;
+  aliases_total: number;
+  aliases_phrase: number;
+  aliases_pattern: number;
+  examples: string;
+  events_30d: number;
+  is_active: boolean;
+}
+
 /** Решение по строке каталога источников. Описание строки — в src/data. */
 export type CatalogStatus = 'not_connected' | 'in_progress' | 'connected' | 'rejected';
 
