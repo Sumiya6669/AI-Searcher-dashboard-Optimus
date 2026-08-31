@@ -440,6 +440,42 @@ export interface IntegrationRow {
   editable: boolean;
 }
 
+/**
+ * Обращение в чате. Вопрос и ответ хранятся у спрашивающего: своё видит
+ * автор, всё — администратор. Это нужно не для отчётности, а чтобы было
+ * видно, о чём людей спрашивают чаще всего и чего системе не хватает.
+ */
+export type ChatStatus = 'pending' | 'answered' | 'failed' | 'empty';
+
+export interface ChatMessageRow {
+  id: number;
+  user_id: string;
+  question: string;
+  answer: string | null;
+  status: ChatStatus;
+  error: string | null;
+  found_events: number;
+  found_tenders: number;
+  cost_usd: number | null;
+  asked_at: string;
+  answered_at: string | null;
+}
+
+/**
+ * Материал, отобранный базой под правами спрашивающего. Уходит в подсказку
+ * модели целиком и только он: то, чего здесь нет, модель придумать не может.
+ */
+export interface ChatMaterial {
+  question: string;
+  days: number;
+  obshchiy_otvet: boolean;
+  sushchnostey_naydeno: number;
+  events: unknown[];
+  tenders: unknown[];
+  events_count: number;
+  tenders_count: number;
+}
+
 /** Обёртка результата: ошибка одного блока не должна ломать страницу. */
 export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
 

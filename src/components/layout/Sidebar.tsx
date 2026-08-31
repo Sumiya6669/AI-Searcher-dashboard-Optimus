@@ -7,6 +7,7 @@ import {
   KeyRound,
   Library,
   ListTree,
+  MessageSquare,
   Newspaper,
   Radio,
   Settings,
@@ -43,7 +44,10 @@ interface NavGroup {
 export const NAV: NavGroup[] = [
   {
     title: 'Главное',
-    items: [{ href: '/dashboard', label: 'Дашборд', icon: Gauge }],
+    items: [
+      { href: '/dashboard', label: 'Дашборд', icon: Gauge },
+      { href: '/chat', label: 'Чат', icon: MessageSquare },
+    ],
   },
   {
     title: 'Мониторинг',
