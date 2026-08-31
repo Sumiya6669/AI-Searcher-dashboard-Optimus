@@ -9,6 +9,7 @@ import { ButtonLink } from '@/components/ui/Button';
 import { Card, CardBody, CardHead, DefinitionList, PageHeader } from '@/components/ui/Card';
 import { ErrorState } from '@/components/ui/States';
 import { formatDateTime, formatHoursLeft, formatMoneyKzt, formatNumber } from '@/lib/format';
+import { tenderSourceLabel } from '@/lib/domain';
 import { fetchTenderById } from '@/server/queries/tenders';
 import { fetchThresholds } from '@/server/queries/admin';
 
@@ -77,9 +78,9 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
                     term: 'Количество',
                     value: tender.qty ? `${formatNumber(tender.qty)} ${tender.unit ?? ''}`.trim() : '—',
                   },
-                  { term: 'Способ закупки', value: tender.trade_method ?? '—' },
+                  { term: 'Способ закупки', value: tender.trade_method_name ?? tender.trade_method ?? '—' },
                   { term: 'Код ТРУ', value: tender.ktru_code ?? 'из карточки не получен' },
-                  { term: 'Место поставки', value: tender.kato ?? tender.delivery_place ?? '—' },
+                  { term: 'Место поставки', value: tender.delivery_place ?? tender.kato_name ?? tender.kato ?? '—' },
                   { term: 'Срок поставки', value: tender.delivery_term ?? '—' },
                   { term: 'Описание', value: tender.description ?? '—' },
                 ]}
@@ -149,7 +150,7 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
             <CardBody>
               <DefinitionList
                 items={[
-                  { term: 'Источник', value: tender.source === 'goszakup' ? 'goszakup.gov.kz' : tender.source },
+                  { term: 'Источник', value: tenderSourceLabel(tender.source) },
                   { term: 'Карточка получена', value: tender.enriched ? 'да' : 'нет' },
                   { term: 'Оповещение', value: tender.is_notified ? 'отправлено' : 'не отправлялось' },
                   { term: 'Напоминание', value: tender.reminder_sent ? 'отправлено' : 'не отправлялось' },

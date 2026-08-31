@@ -145,6 +145,13 @@ export interface TenderCardRow {
   customer_bin: string | null;
   organizer_name: string | null;
   trade_method: string | null;
+  /**
+   * Способ закупки и регион названием, а не кодом. Подстановка сделана в
+   * представлении базы: карточку читают дашборд, оповещения в Telegram и
+   * выгрузка в Excel, и название должно быть одним и тем же во всех трёх.
+   */
+  trade_method_name: string | null;
+  kato_name: string | null;
   portal_status: string | null;
   amount: number | null;
   qty: number | null;

@@ -162,3 +162,19 @@ export function severityFromParam(value: string | undefined): Severity[] {
     .map((v) => Number.parseInt(v, 10))
     .filter((n) => n >= 1 && n <= 5) as Severity[];
 }
+
+/**
+ * Откуда пришёл лот. Название площадки говорит человеку больше, чем внутренний
+ * код источника: лоты из разных площадок ведут себя по-разному — на одной есть
+ * срок приёма заявок сразу, на другой он появляется позже.
+ */
+const TENDER_SOURCE_LABEL: Record<string, string> = {
+  goszakup: 'goszakup.gov.kz',
+  tenderbot: 'tenderbot.kz',
+  tender_api: 'внешний API закупок',
+};
+
+export function tenderSourceLabel(source: string | null | undefined): string {
+  if (!source) return 'источник не указан';
+  return TENDER_SOURCE_LABEL[source] ?? source;
+}

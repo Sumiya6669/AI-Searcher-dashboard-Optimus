@@ -8,6 +8,7 @@ import { Card, CardBody, CardHead, PageHeader } from '@/components/ui/Card';
 import { EmptyState, ErrorState, KpiSkeleton, LoadingSkeleton } from '@/components/ui/States';
 import { LinkCell, Pagination, TableWrap, Td, Th, Tr } from '@/components/ui/Table';
 import { formatDateTime, formatHoursLeft, formatMoneyKzt, formatNumber } from '@/lib/format';
+import { tenderSourceLabel } from '@/lib/domain';
 import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
 import { fetchStopWordStats, fetchTenderKpi, fetchTenders } from '@/server/queries/tenders';
 import type { TenderUrgency } from '@/lib/types';
@@ -178,7 +179,9 @@ async function TenderTable({ params }: { params: SearchParamsInput }) {
                 </Td>
                 <LinkCell href={`/tenders/${tender.tender_id}`}>
                   <span className="line-clamp-2">{tender.title}</span>
-                  <span className="block text-[11.5px] font-normal text-[var(--color-ink-3)]">{tender.lot_no}</span>
+                  <span className="block text-[11.5px] font-normal text-[var(--color-ink-3)]">
+                    {tender.lot_no} · {tenderSourceLabel(tender.source)}
+                  </span>
                 </LinkCell>
                 <Td numeric>{formatMoneyKzt(tender.amount)}</Td>
                 <Td className="max-w-52 text-[var(--color-ink-2)]">{tender.customer_name ?? '—'}</Td>
