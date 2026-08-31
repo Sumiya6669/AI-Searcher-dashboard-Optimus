@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { SentimentBadge, SeverityBadge } from './Badges';
 import { EmptyState } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
-import { formatShort, hostOf, truncate } from '@/lib/format';
+import { formatShort, hostOf, plural, truncate } from '@/lib/format';
 import type { EventListRow } from '@/lib/types';
 
 /**
@@ -49,6 +49,18 @@ export function EventCard({ event }: { event: EventListRow }) {
         <span>{event.category}</span>
         <span aria-hidden>·</span>
         <time dateTime={event.event_date}>{formatShort(event.event_date)}</time>
+        {event.duplicates_count > 0 ? (
+          <>
+            <span aria-hidden>·</span>
+            {/* Число изданий, написавших ту же историю. Повторно она не
+                рассылалась, но знать об этом полезно: четыре пересказа —
+                довод в пользу значимости. */}
+            <span title="Пересказы той же истории из других источников сведены сюда и повторно не рассылались">
+              и ещё {event.duplicates_count}{' '}
+              {plural(event.duplicates_count, 'источник', 'источника', 'источников')}
+            </span>
+          </>
+        ) : null}
         <span className="ml-auto flex items-center gap-1.5">
           <SentimentBadge sentiment={event.sentiment} />
           <SeverityBadge level={event.importance} compact />

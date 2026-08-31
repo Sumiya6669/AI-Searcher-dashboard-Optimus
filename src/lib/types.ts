@@ -47,6 +47,12 @@ export interface EventListRow {
   in_digest: boolean;
   entity_ids: number[];
   entity_types: string[];
+  /**
+   * Сколько пересказов той же истории сведено с этим событием. Ноль — история
+   * пришла один раз. Три — её написали четыре издания, и это само по себе
+   * признак значимости, а не служебная мелочь.
+   */
+  duplicates_count: number;
 }
 
 export interface DashboardKpi {

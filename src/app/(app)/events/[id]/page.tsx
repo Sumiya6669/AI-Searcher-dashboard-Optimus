@@ -9,7 +9,7 @@ import { ButtonLink } from '@/components/ui/Button';
 import { Card, CardBody, CardHead, DefinitionList, PageHeader } from '@/components/ui/Card';
 import { ErrorState } from '@/components/ui/States';
 import { AGENT_LABEL } from '@/lib/domain';
-import { formatDateTime, hostOf } from '@/lib/format';
+import { formatDateTime, formatNumber, hostOf } from '@/lib/format';
 import { fetchEventById, fetchRelatedEvents } from '@/server/queries/events';
 
 export const metadata: Metadata = { title: 'Событие' };
@@ -143,6 +143,16 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               <DefinitionList
                 items={[
                   { term: 'Источник', value: event.source_name ?? '—' },
+                  // Пересказы той же истории сведены сюда и не рассылаются
+                  // повторно. Само их число — довод в пользу значимости:
+                  // историю, которую переписали четыре издания, стоит читать.
+                  {
+                    term: 'Пересказов сведено',
+                    value:
+                      event.duplicates_count > 0
+                        ? `${formatNumber(event.duplicates_count)} — та же история пришла из других источников, повторно не рассылалась`
+                        : 'нет, история пришла один раз',
+                  },
                   { term: 'Тип события', value: AGENT_LABEL[event.agent] ?? event.agent },
                   { term: 'Дата события', value: formatDateTime(event.event_date) },
                   { term: 'Поступило в систему', value: formatDateTime(event.created_at) },

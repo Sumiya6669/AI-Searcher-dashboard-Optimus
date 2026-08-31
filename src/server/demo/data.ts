@@ -67,6 +67,7 @@ export const DEMO_EVENTS: EventListRow[] = [
     in_digest: false,
     entity_ids: [33],
     entity_types: ['competitor'],
+    duplicates_count: 0,
   },
   {
     event_id: 202,
@@ -92,6 +93,7 @@ export const DEMO_EVENTS: EventListRow[] = [
     in_digest: true,
     entity_ids: [41],
     entity_types: ['brand'],
+    duplicates_count: 0,
   },
   {
     event_id: 199,
@@ -117,6 +119,7 @@ export const DEMO_EVENTS: EventListRow[] = [
     in_digest: true,
     entity_ids: [58],
     entity_types: ['product'],
+    duplicates_count: 0,
   },
   {
     event_id: 198,
@@ -142,6 +145,7 @@ export const DEMO_EVENTS: EventListRow[] = [
     in_digest: true,
     entity_ids: [37],
     entity_types: ['brand'],
+    duplicates_count: 0,
   },
   {
     event_id: 166,
@@ -167,6 +171,7 @@ export const DEMO_EVENTS: EventListRow[] = [
     in_digest: true,
     entity_ids: [22, 61],
     entity_types: ['brand', 'topic'],
+    duplicates_count: 0,
   },
 ];
 
