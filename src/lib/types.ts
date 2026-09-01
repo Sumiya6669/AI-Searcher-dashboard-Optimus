@@ -53,6 +53,15 @@ export interface EventListRow {
    * признак значимости, а не служебная мелочь.
    */
   duplicates_count: number;
+  /**
+   * Решение по направлениям: пропустить, считать фоном или исключить.
+   * Считается на чтении, а не хранится: правила меняются, и сохранённое
+   * решение через неделю разошлось бы с действующей настройкой.
+   */
+  direction_verdict: 'pass' | 'background' | 'exclude';
+  direction_what: string;
+  direction_geo: string;
+  direction_weight: number;
 }
 
 export interface DashboardKpi {
@@ -552,4 +561,30 @@ export function ok<T>(data: T): Result<T> {
 
 export function fail<T>(error: string): Result<T> {
   return { ok: false, error };
+}
+
+/**
+ * Направление новостей: вторая и третья оси отбора. Первая ось — словарь
+ * сущностей — отвечает «кто упомянут». Этого мало: разметка ста событий
+ * исполнительным директором дала пять полезных из ста именно потому, что
+ * названная марка сама по себе пропускала и вакансию, и котировки.
+ */
+export type DirectionKind = 'interest' | 'background' | 'exclude';
+export type DirectionAxis = 'what' | 'where';
+
+export interface DirectionRow {
+  id: number;
+  code: string;
+  kind: DirectionKind;
+  axis: DirectionAxis;
+  name: string;
+  description: string | null;
+  pattern: string;
+  weight: number;
+  is_active: boolean;
+  /** Откуда правило взялось: ссылка на замечание в разметке. */
+  note: string | null;
+  events_30d: number;
+  materials_30d: number;
+  updated_at: string;
 }

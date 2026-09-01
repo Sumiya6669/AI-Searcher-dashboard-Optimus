@@ -2,6 +2,7 @@
 
 import {
   Building2,
+  Compass,
   Gauge,
   Gavel,
   KeyRound,
@@ -64,6 +65,7 @@ export const NAV: NavGroup[] = [
       { href: '/admin', label: 'Состояние системы', icon: ShieldCheck, adminOnly: true },
       { href: '/admin/sources', label: 'Источники и сбор', icon: Radio, adminOnly: true },
       { href: '/admin/catalog', label: 'Каталог источников', icon: Library, adminOnly: true },
+      { href: '/admin/directions', label: 'Направления', icon: Compass, adminOnly: true },
       { href: '/admin/semantics', label: 'Семантика', icon: ListTree, adminOnly: true },
       { href: '/admin/integrations', label: 'Интеграции', icon: KeyRound, adminOnly: true },
       { href: '/admin/people', label: 'Люди и группы', icon: Users, adminOnly: true },

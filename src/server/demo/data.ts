@@ -68,6 +68,10 @@ export const DEMO_EVENTS: EventListRow[] = [
     entity_ids: [33],
     entity_types: ['competitor'],
     duplicates_count: 0,
+    direction_verdict: 'pass',
+    direction_what: 'Новый продукт или линейка',
+    direction_geo: 'Казахстан',
+    direction_weight: 1.6,
   },
   {
     event_id: 202,
@@ -94,6 +98,10 @@ export const DEMO_EVENTS: EventListRow[] = [
     entity_ids: [41],
     entity_types: ['brand'],
     duplicates_count: 0,
+    direction_verdict: 'pass',
+    direction_what: 'Новый продукт или линейка',
+    direction_geo: 'Казахстан',
+    direction_weight: 1.6,
   },
   {
     event_id: 199,
@@ -120,6 +128,10 @@ export const DEMO_EVENTS: EventListRow[] = [
     entity_ids: [58],
     entity_types: ['product'],
     duplicates_count: 0,
+    direction_verdict: 'pass',
+    direction_what: 'Новый продукт или линейка',
+    direction_geo: 'Казахстан',
+    direction_weight: 1.6,
   },
   {
     event_id: 198,
@@ -146,6 +158,10 @@ export const DEMO_EVENTS: EventListRow[] = [
     entity_ids: [37],
     entity_types: ['brand'],
     duplicates_count: 0,
+    direction_verdict: 'pass',
+    direction_what: 'Новый продукт или линейка',
+    direction_geo: 'Казахстан',
+    direction_weight: 1.6,
   },
   {
     event_id: 166,
@@ -172,6 +188,10 @@ export const DEMO_EVENTS: EventListRow[] = [
     entity_ids: [22, 61],
     entity_types: ['brand', 'topic'],
     duplicates_count: 0,
+    direction_verdict: 'pass',
+    direction_what: 'Новый продукт или линейка',
+    direction_geo: 'Казахстан',
+    direction_weight: 1.6,
   },
 ];
 
