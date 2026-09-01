@@ -12,6 +12,12 @@ import { formatDateTime, formatHoursLeft, formatMoneyKzt, formatNumber } from '@
 import { tenderSourceLabel } from '@/lib/domain';
 import { fetchTenderById } from '@/server/queries/tenders';
 import { fetchThresholds } from '@/server/queries/admin';
+import { fetchTenderAnalysis } from '@/server/queries/analysis';
+import {
+  PriorityBadge,
+  RecommendationCard,
+  ScoreBreakdown,
+} from '@/components/domain/Analysis';
 
 export const metadata: Metadata = { title: 'Лот' };
 export const dynamic = 'force-dynamic';
@@ -32,7 +38,11 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
   const tender = result.data;
   if (!tender) notFound();
 
-  const thresholds = await fetchThresholds();
+  const [thresholds, analysisResult] = await Promise.all([
+    fetchThresholds(),
+    fetchTenderAnalysis(tenderId),
+  ]);
+  const analysis = analysisResult.ok ? analysisResult.data : null;
   const minAmount = thresholds.ok
     ? (thresholds.data.find((t) => t.key === 'tender_min_amount')?.value_num ?? null)
     : null;
@@ -54,6 +64,7 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
           <>
             <UrgencyBadge urgency={tender.urgency} text={formatHoursLeft(tender.hours_left)} />
             <SeverityBadge level={tender.importance} compact />
+            {analysis ? <PriorityBadge priority={analysis.priority} /> : null}
             {tender.link ? (
               <ButtonLink href={tender.link} external variant="primary" size="sm">
                 Открыть на goszakup.gov.kz
@@ -66,6 +77,39 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <div className="space-y-4">
+          {analysis ? (
+            <Card>
+              <CardHead
+                title="Что это за лот"
+                hint="товар покупают у нас напрямую; работы — через подрядчика"
+              />
+              <CardBody>
+                <DefinitionList
+                  items={[
+                    { term: 'Тип возможности', value: analysis.opportunity_name },
+                    {
+                      term: 'Допуск эквивалента',
+                      value:
+                        analysis.equivalent_allowed === true
+                          ? 'эквивалент допускается'
+                          : analysis.equivalent_allowed === false
+                            ? 'только оригинал'
+                            : 'в тексте лота не сказано',
+                    },
+                    {
+                      term: 'Названный бренд',
+                      value: analysis.brand_requirement ?? 'бренд в лоте не назван',
+                    },
+                    {
+                      term: 'Наши товарные группы',
+                      value: analysis.product_category_names ?? 'из нашего ассортимента ничего не узнано',
+                    },
+                  ]}
+                />
+              </CardBody>
+            </Card>
+          ) : null}
+
           <Card>
             <CardHead title="Лот" />
             <CardBody>
@@ -117,6 +161,25 @@ export default async function TenderPage({ params }: { params: Promise<{ id: str
         </div>
 
         <div className="space-y-4">
+          {analysis ? (
+            <>
+              <RecommendationCard
+                action={analysis.recommended_action}
+                department={analysis.department_name}
+                contactRole={analysis.contact_role}
+                categoryNames={analysis.product_category_names}
+                positions={analysis.product_positions}
+              />
+              <ScoreBreakdown
+                positive={analysis.positive_factors}
+                penalties={analysis.penalties}
+                total={analysis.total_score}
+                priority={analysis.priority}
+                hint="пороги: 70 немедленно, 50 тендерному менеджеру, 30 в проектные продажи"
+              />
+            </>
+          ) : null}
+
           <Card>
             <CardHead title="Сроки" />
             <CardBody>

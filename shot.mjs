@@ -39,6 +39,10 @@ const mobile = { width: 390, height: 844 };
 
 const ROUTES = [
   ['dashboard', '/dashboard'],
+  ['projects', '/projects'],
+  ['project-detail', '/projects/1'],
+  ['catalog', '/catalog'],
+  ['scoring', '/admin/scoring'],
   ['events', '/events'],
   ['event-detail', '/events/201'],
   ['tenders', '/tenders'],

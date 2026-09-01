@@ -10,6 +10,7 @@ const TABS = [
   { href: '/admin/sources', label: 'Источники и сбор', hint: 'откуда идёт материал и что просело' },
   { href: '/admin/catalog', label: 'Каталог источников', hint: 'список наблюдения и решения по нему' },
   { href: '/admin/directions', label: 'Направления', hint: 'что считать новостью и на каком рынке' },
+  { href: '/admin/scoring', label: 'Веса оценки', hint: 'из чего собирается балл записи' },
   { href: '/admin/semantics', label: 'Семантика', hint: 'под какие объекты подходит номенклатура' },
   { href: '/admin/integrations', label: 'Интеграции', hint: 'внешние ключи и что чем ограничено' },
   { href: '/admin/people', label: 'Люди и группы', hint: 'доступ и адресаты рассылки' },

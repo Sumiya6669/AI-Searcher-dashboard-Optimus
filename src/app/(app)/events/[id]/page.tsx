@@ -11,6 +11,16 @@ import { ErrorState } from '@/components/ui/States';
 import { AGENT_LABEL } from '@/lib/domain';
 import { formatDateTime, formatNumber, hostOf } from '@/lib/format';
 import { fetchEventById, fetchRelatedEvents } from '@/server/queries/events';
+import { fetchEventAnalysis } from '@/server/queries/analysis';
+import {
+  ConfidenceBadge,
+  EvidenceCard,
+  PriorityBadge,
+  RecommendationCard,
+  ScoreBreakdown,
+  StreamBadge,
+  VerificationBadge,
+} from '@/components/domain/Analysis';
 
 export const metadata: Metadata = { title: 'Событие' };
 export const dynamic = 'force-dynamic';
@@ -31,7 +41,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const event = result.data;
   if (!event) notFound();
 
-  const related = await fetchRelatedEvents(event.entity_ids, event.event_id, 5);
+  const [related, analysisResult] = await Promise.all([
+    fetchRelatedEvents(event.entity_ids, event.event_id, 5),
+    fetchEventAnalysis(eventId),
+  ]);
+  const analysis = analysisResult.ok ? analysisResult.data : null;
 
   return (
     <>
@@ -50,6 +64,14 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           <>
             <SeverityBadge level={event.importance} />
             <SentimentBadge sentiment={event.sentiment} />
+            {analysis ? (
+              <>
+                <StreamBadge stream={analysis.stream} />
+                <PriorityBadge priority={analysis.priority} />
+                <ConfidenceBadge confidence={analysis.confidence} />
+                <VerificationBadge status={analysis.verification_status} />
+              </>
+            ) : null}
             {event.link ? (
               <ButtonLink href={event.link} external variant="primary" size="sm">
                 Открыть источник
@@ -79,6 +101,22 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             </CardBody>
           </Card>
 
+          {analysis ? <EvidenceCard items={analysis.evidence} /> : null}
+
+          {analysis?.project_id ? (
+            <Card>
+              <CardHead title="Объект" hint="эта новость привязана к объекту в разделе «Проекты»" />
+              <CardBody>
+                <Link
+                  href={`/projects/${analysis.project_id}`}
+                  className="text-[13.5px] font-semibold text-[var(--color-accent-ink)]"
+                >
+                  Открыть карточку объекта
+                </Link>
+              </CardBody>
+            </Card>
+          ) : null}
+
           <Card>
             <CardHead title="Связанные события" hint="по тем же брендам и конкурентам" />
             {related.ok ? (
@@ -90,6 +128,27 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <div className="space-y-4">
+          {analysis ? (
+            <>
+              <RecommendationCard
+                action={analysis.recommended_action}
+                department={analysis.department_name}
+                departmentScope={analysis.department_scope}
+                contactRole={analysis.contact_role}
+                categoryNames={analysis.product_category_names}
+                positions={analysis.product_positions}
+              />
+              <ScoreBreakdown
+                base={analysis.base_score ?? null}
+                positive={analysis.positive_factors}
+                penalties={analysis.penalties}
+                total={analysis.total_score}
+                priority={analysis.priority}
+                hint="пороги: 50 оповещение руководству, 30 недельная сводка"
+              />
+            </>
+          ) : null}
+
           <Card>
             <CardHead title="Привязка" />
             <CardBody>

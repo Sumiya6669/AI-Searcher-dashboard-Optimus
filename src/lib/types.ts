@@ -588,3 +588,175 @@ export interface DirectionRow {
   materials_30d: number;
   updated_at: string;
 }
+
+/* --- Анализ по комплекту исполнительного директора ------------------------ */
+
+/** Слагаемое балла: код, человеческое название, вес. */
+export interface ScoreFactor {
+  code: string;
+  name: string;
+  weight: number;
+}
+
+/**
+ * Доказательство вывода. Комплект требует по каждому утверждению кусок
+ * исходного текста: проверять систему нужно не по объяснению, а по цитате.
+ */
+export interface EvidenceItem {
+  claim: string;
+  source_fragment: string | null;
+  url?: string | null;
+}
+
+export type StreamKind = 'competitor_news' | 'project_lead' | 'market_info';
+export type PriorityKind = 'archive' | 'monitoring' | 'medium' | 'high' | 'critical';
+export type ConfidenceKind = 'low' | 'medium' | 'high';
+export type VerificationKind = 'unverified' | 'partially_verified' | 'verified';
+export type OpportunityKind = 'direct_supply' | 'project_lead' | 'services';
+
+export interface EventAnalysisRow {
+  event_id: number;
+  stream: StreamKind | null;
+  base_score: number | null;
+  total_score: number | null;
+  priority: PriorityKind | null;
+  confidence: ConfidenceKind | null;
+  verification_status: VerificationKind | null;
+  evidence: EvidenceItem[];
+  positive_factors: ScoreFactor[];
+  penalties: ScoreFactor[];
+  recommended_action: string | null;
+  department_code: string | null;
+  department_name: string | null;
+  department_scope: string | null;
+  contact_role: string | null;
+  product_categories: string[];
+  project_id: number | null;
+  product_category_names: string | null;
+  product_positions: number | null;
+}
+
+export interface TenderAnalysisRow {
+  tender_id: number;
+  opportunity: OpportunityKind | null;
+  opportunity_name: string;
+  equivalent_allowed: boolean | null;
+  brand_requirement: string | null;
+  total_score: number | null;
+  priority: PriorityKind | null;
+  positive_factors: ScoreFactor[];
+  penalties: ScoreFactor[];
+  recommended_action: string | null;
+  department_code: string | null;
+  department_name: string | null;
+  contact_role: string | null;
+  product_categories: string[];
+  product_category_names: string | null;
+  product_positions: number | null;
+}
+
+export interface ProjectRow {
+  id: number;
+  project_name: string;
+  object_type: string | null;
+  object_type_name: string | null;
+  stage_code: string | null;
+  stage_name: string | null;
+  stage_score: number | null;
+  stage_sort: number | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
+  place: string | null;
+  investor: string | null;
+  customer: string | null;
+  designer: string | null;
+  general_contractor: string | null;
+  total_score: number;
+  priority: PriorityKind;
+  status: 'monitoring' | 'active' | 'hot' | 'commissioned' | 'lost';
+  confidence: ConfidenceKind;
+  verification_status: VerificationKind;
+  sources_count: number;
+  positive_factors: ScoreFactor[];
+  penalties: ScoreFactor[];
+  evidence: EvidenceItem[];
+  product_categories: string[];
+  product_category_names: string | null;
+  recommended_action: string | null;
+  department_code: string | null;
+  department_name: string | null;
+  contact_role: string | null;
+  first_event_id: number | null;
+  last_event_id: number | null;
+  first_seen_at: string;
+  updated_at: string;
+  link: string | null;
+}
+
+export interface CatalogGroupRow {
+  code: string;
+  name: string;
+  applies_to: string | null;
+  cluster_code: string | null;
+  cluster_name: string | null;
+  is_trade: boolean;
+  sort: number;
+  positions: number;
+  discontinued: number;
+  needs_review: number;
+  brands: number;
+  lines: number;
+  top_brands: string | null;
+}
+
+export interface CatalogItemRow {
+  id: number;
+  sku: string | null;
+  name: string;
+  brand_name: string | null;
+  product_line: string | null;
+  category_code: string | null;
+  category_name: string | null;
+  pack_size: number | null;
+  pack_unit: string | null;
+  color_code: string | null;
+  color_name: string | null;
+  tint_base: string | null;
+  gloss: string | null;
+  substrate: string[];
+  project_codes: string[];
+  discontinued: boolean;
+  needs_review: boolean;
+}
+
+export interface CatalogTotalsRow {
+  positions: number;
+  trade: number;
+  brands: number;
+  lines: number;
+  with_pack: number;
+  with_application: number;
+  needs_review: number;
+  discontinued: number;
+}
+
+export interface ScoringFactorRow {
+  id: number;
+  stream: 'competitor_news' | 'project_lead' | 'tender';
+  code: string;
+  name: string;
+  weight: number;
+  kind: 'base' | 'positive' | 'penalty' | 'threshold';
+  is_active: boolean;
+  note: string | null;
+}
+
+export interface StageRow {
+  code: string;
+  name: string;
+  score: number;
+  sort: number;
+  note: string | null;
+  projects: number;
+}
