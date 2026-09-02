@@ -122,13 +122,13 @@ export function demoProjects(): ProjectRow[] {
 
 export function demoCatalogTotals(): CatalogTotalsRow {
   return {
-    positions: 11674,
+    positions: 11686,
     trade: 11334,
-    brands: 30,
-    lines: 214,
+    brands: 31,
+    lines: 226,
     with_pack: 9561,
-    with_application: 9457,
-    needs_review: 340,
+    with_application: 9469,
+    needs_review: 0,
     discontinued: 668,
   };
 }

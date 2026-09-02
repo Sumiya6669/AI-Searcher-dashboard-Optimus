@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 import { FilterBar } from '@/components/domain/FilterBar';
 import { KpiCard } from '@/components/domain/KpiCard';
@@ -94,7 +93,6 @@ export default async function CatalogPage({
         <Card>
           <CardHead title="Товарные группы" hint="группа — кластер комплекта — позиций" />
           <TableWrap>
-            <table className="w-full min-w-[720px] border-collapse">
               <thead>
                 <tr>
                   <Th>Группа</Th>
@@ -133,25 +131,20 @@ export default async function CatalogPage({
                   </Tr>
                 ))}
               </tbody>
-            </table>
           </TableWrap>
         </Card>
 
-        {/* useSearchParams требует границы Suspense: без неё Next отдаёт
-            разметку, не совпадающую с той, что собирает браузер. */}
-        <Suspense fallback={<div className="mb-3 h-8" />}>
-          <FilterBar
-            fields={[
-              { key: 'q', kind: 'search', label: 'Поиск', placeholder: 'наименование или артикул' },
-              {
-                key: 'group',
-                kind: 'select',
-                label: 'Группа',
-                options: trade.map((g) => ({ value: g.code, label: g.name })),
-              },
-            ]}
-          />
-        </Suspense>
+        <FilterBar
+          fields={[
+            { key: 'q', kind: 'search', label: 'Поиск', placeholder: 'наименование или артикул' },
+            {
+              key: 'group',
+              kind: 'select',
+              label: 'Группа',
+              options: trade.map((g) => ({ value: g.code, label: g.name })),
+            },
+          ]}
+        />
 
         <Card>
           <CardHead
@@ -168,7 +161,6 @@ export default async function CatalogPage({
             <EmptyState title="Ничего не нашлось" hint="Уточните запрос или снимите отбор по группе." />
           ) : (
             <TableWrap>
-              <table className="w-full min-w-[880px] border-collapse">
                 <thead>
                   <tr>
                     <Th>Артикул</Th>
@@ -213,7 +205,6 @@ export default async function CatalogPage({
                     </Tr>
                   ))}
                 </tbody>
-              </table>
             </TableWrap>
           )}
         </Card>
