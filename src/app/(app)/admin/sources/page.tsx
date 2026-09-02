@@ -10,6 +10,7 @@ import { LinkCell, TableWrap, Td, Th, Tr } from '@/components/ui/Table';
 import { PERIOD_OPTIONS } from '@/lib/domain';
 import { formatInterval } from '@/lib/interval';
 import { formatNumber, formatPercent, formatRelative, truncate } from '@/lib/format';
+import type { SourceFreshness } from '@/lib/types';
 import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
 import { fetchSourceStats } from '@/server/queries/sources';
 
@@ -32,6 +33,7 @@ export default async function SourcesPage({ searchParams }: { searchParams: Prom
         { value: 'idle', label: 'простаивает' },
         { value: 'disabled', label: 'выключен' },
         { value: 'not_connected', label: 'не подключён' },
+        { value: 'all', label: 'показать все, включая нерабочие' },
       ],
     },
   ];
@@ -69,21 +71,53 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
     );
   }
 
-  const rows = state ? result.data.filter((s) => s.freshness === state) : result.data;
-  const maxShare = Math.max(1, ...result.data.map((s) => s.share_pct));
+  // Источники, которые заказчик сам выключил, и те, что ещё не подключены, в
+  // обычном виде не показываются: это не отказ работы, а решение и незакрытая
+  // настройка, а в общем списке они читаются как поломка. Строка над таблицей
+  // всё равно называет их количество, и любой из них открывается через фильтр —
+  // спрятать насовсем значило бы потерять их из вида.
+  // Состояние «заблокирован» остаётся в таблице всегда: это работающий процесс,
+  // до которого не доходят данные по внешней причине, и именно за этим страница
+  // и нужна.
+  const OFF_STATES: SourceFreshness[] = ['disabled', 'not_connected'];
+  const showAll = state === 'all';
+  const rows = showAll
+    ? result.data
+    : state
+      ? result.data.filter((s) => s.freshness === state)
+      : result.data.filter((s) => !OFF_STATES.includes(s.freshness));
+
+  const working = result.data.filter((s) => !OFF_STATES.includes(s.freshness));
+  const maxShare = Math.max(1, ...working.map((s) => s.share_pct));
+  const offCount = result.data.length - working.length;
   const notConnected = result.data.filter((s) => !s.connected).length;
+  const disabledCount = result.data.filter((s) => s.freshness === 'disabled').length;
+  const blockedCount = working.filter((s) => s.freshness === 'blocked').length;
 
   return (
     <div className="space-y-4">
       <Card>
-        <CardBody className="text-[12.5px] text-[var(--color-ink-2)]">
-          Неподключённые источники не скрываются: строка с нулём и подписью, чего не хватает, честнее, чем её
-          отсутствие — она показывает, какая часть охвата не работает. Сейчас ожидают настройки: {notConnected}.
+        <CardBody className="space-y-1.5 text-[12.5px] text-[var(--color-ink-2)]">
+          <p>
+            В таблице — источники, с которых сбор идёт или должен идти. Скрыто {offCount}: выключено{' '}
+            {disabledCount}, ожидают настройки {notConnected}. Их видно через фильтр «показать все, включая
+            нерабочие» — совсем убирать их нельзя, иначе не останется следа, какая часть охвата не работает.
+          </p>
+          {blockedCount > 0 ? (
+            <p className="text-[var(--color-ink-1)]">
+              Заблокированных источников: {blockedCount}. Такой источник в таблице остаётся: запуски по нему
+              проходят, а данные не приходят по внешней причине — это не выключенный канал, а потерянный, и
+              причина указана в последнем столбце.
+            </p>
+          ) : null}
         </CardBody>
       </Card>
 
       <Card>
-        <CardHead title={`Источников: ${formatNumber(rows.length)}`} hint="порядок по объёму собственных данных" />
+        <CardHead
+          title={`Источников: ${formatNumber(rows.length)}`}
+          hint={showAll ? 'показаны все, включая выключенные' : 'порядок по объёму собственных данных'}
+        />
         <TableWrap>
           <thead>
             <tr>
