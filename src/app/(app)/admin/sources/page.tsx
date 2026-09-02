@@ -128,12 +128,33 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
                 </Td>
                 <Td className="whitespace-nowrap text-[var(--color-ink-2)]">
                   {source.last_activity_at ? formatRelative(source.last_activity_at) : 'активности не было'}
-                  <span className="block text-[11.5px] text-[var(--color-ink-3)]">
-                    ожидается раз в {formatInterval(source.expected_interval_min)}
-                  </span>
+                  {/* У выключенного и не подключённого источника ожидаемого промежутка нет:
+                      база отдаёт null, и подпись не рисуется вовсе. Раньше подставлялось
+                      значение по умолчанию, и выключенная запись обещала «раз в 3 ч». */}
+                  {source.expected_interval_min !== null ? (
+                    <span className="block text-[11.5px] text-[var(--color-ink-3)]">
+                      ожидается раз в {formatInterval(source.expected_interval_min)}
+                    </span>
+                  ) : null}
                 </Td>
                 <Td className="max-w-56 text-[12.5px] text-[var(--color-ink-2)]">
-                  {source.blocker || (source.last_error ? truncate(source.last_error, 90) : '—')}
+                  {/* Ошибка показывается только пока она новее последнего успеха — это
+                      решает база. И всегда с датой: без даты позавчерашний отказ читался
+                      как сегодняшний, и настоящую свежую ошибку было не заметить. */}
+                  {source.blocker ? (
+                    source.blocker
+                  ) : source.last_error ? (
+                    <>
+                      {truncate(source.last_error, 90)}
+                      {source.last_error_at ? (
+                        <span className="block text-[11.5px] text-[var(--color-ink-3)]">
+                          отказ {formatRelative(source.last_error_at)}
+                        </span>
+                      ) : null}
+                    </>
+                  ) : (
+                    '—'
+                  )}
                 </Td>
               </Tr>
             ))}

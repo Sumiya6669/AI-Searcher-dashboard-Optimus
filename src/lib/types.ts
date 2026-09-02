@@ -208,7 +208,14 @@ export interface StopWordRow {
   examples: string | null;
 }
 
-export type SourceFreshness = 'active' | 'stale' | 'error' | 'idle' | 'disabled' | 'not_connected';
+export type SourceFreshness =
+  | 'active'
+  | 'stale'
+  | 'blocked'
+  | 'error'
+  | 'idle'
+  | 'disabled'
+  | 'not_connected';
 
 export interface SourceStatsRow {
   source_id: number;
@@ -220,7 +227,7 @@ export interface SourceStatsRow {
   missing: string;
   blocker: string;
   workflow_code: string | null;
-  expected_interval_min: number;
+  expected_interval_min: number | null;
   materials_total: number;
   materials_period: number;
   share_pct: number;
@@ -234,6 +241,7 @@ export interface SourceStatsRow {
   runs_failed_24h: number;
   avg_duration_ms: number | null;
   last_error: string | null;
+  last_error_at: string | null;
   freshness: SourceFreshness;
 }
 

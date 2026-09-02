@@ -99,7 +99,14 @@ export default async function SourcePage({
                     term: 'Подключён',
                     value: source.connected ? 'да' : `нет — не заполнено: ${source.missing}`,
                   },
-                  { term: 'Ожидаемая частота', value: `раз в ${formatInterval(source.expected_interval_min)}` },
+                  {
+                    term: 'Ожидаемая частота',
+                    // null означает «ожидать нечего»: источник выключен или не подключён
+                    value:
+                      source.expected_interval_min !== null
+                        ? `раз в ${formatInterval(source.expected_interval_min)}`
+                        : 'не ожидается — источник не работает',
+                  },
                   {
                     term: 'Последняя активность',
                     value: source.last_activity_at
@@ -124,6 +131,11 @@ export default async function SourcePage({
                 <div className="mt-3">
                   <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.09em] text-[var(--color-ink-3)]">
                     Последняя ошибка
+                    {source.last_error_at ? (
+                      <span className="ml-1.5 font-normal normal-case tracking-normal text-[var(--color-ink-3)]">
+                        · {formatDateTime(source.last_error_at)}
+                      </span>
+                    ) : null}
                   </p>
                   <pre className="thin-scroll max-h-40 overflow-auto rounded border border-[var(--color-line-2)] bg-[var(--color-bg)] p-2 text-[11.5px] text-[var(--color-ink-2)]">
                     {truncate(source.last_error, 1200)}

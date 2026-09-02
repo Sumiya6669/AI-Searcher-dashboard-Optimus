@@ -61,6 +61,11 @@ export const FRESHNESS: Record<SourceFreshness, { label: string; tone: Tone; hin
     tone: 'warning',
     hint: 'с последнего обновления прошло больше трёх ожидаемых промежутков',
   },
+  blocked: {
+    label: 'Заблокирован',
+    tone: 'critical',
+    hint: 'запуски проходят, но данные не приходят по внешней причине — она указана в столбце причины',
+  },
   error: { label: 'Ошибка', tone: 'critical', hint: 'запуски падают, успешных за сутки нет' },
   idle: { label: 'Простаивает', tone: 'attention', hint: 'подключён, но ничего не приносит' },
   disabled: { label: 'Выключен', tone: 'neutral', hint: 'источник отключён в справочнике' },

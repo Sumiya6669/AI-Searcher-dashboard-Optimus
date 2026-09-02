@@ -575,6 +575,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: 4200,
     last_error: null,
+    last_error_at: null,
     freshness: 'active',
   },
   {
@@ -601,6 +602,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: 9100,
     last_error: null,
+    last_error_at: null,
     freshness: 'active',
   },
   {
@@ -627,6 +629,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 6,
     avg_duration_ms: 5100,
     last_error: '{"diagnostics":[{"term":"краска","ok":false,"reason":"ответ 502"}]}',
+    last_error_at: hoursAgo(1.5),
     freshness: 'active',
   },
   {
@@ -653,6 +656,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: 15400,
     last_error: null,
+    last_error_at: null,
     freshness: 'active',
   },
   {
@@ -679,6 +683,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: 4200,
     last_error: null,
+    last_error_at: null,
     freshness: 'idle',
   },
   {
@@ -705,6 +710,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: null,
     last_error: null,
+    last_error_at: null,
     freshness: 'not_connected',
   },
   {
@@ -731,6 +737,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: null,
     last_error: null,
+    last_error_at: null,
     freshness: 'disabled',
   },
   {
@@ -757,6 +764,7 @@ export const DEMO_SOURCES: SourceStatsRow[] = [
     runs_failed_24h: 0,
     avg_duration_ms: null,
     last_error: null,
+    last_error_at: null,
     freshness: 'not_connected',
   },
 ];
