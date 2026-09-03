@@ -69,6 +69,11 @@ export const FRESHNESS: Record<SourceFreshness, { label: string; tone: Tone; hin
   error: { label: 'Ошибка', tone: 'critical', hint: 'запуски падают, успешных за сутки нет' },
   idle: { label: 'Простаивает', tone: 'attention', hint: 'подключён, но ничего не приносит' },
   disabled: { label: 'Выключен', tone: 'neutral', hint: 'источник отключён в справочнике' },
+  retired: {
+    label: 'Снят с обслуживания',
+    tone: 'neutral',
+    hint: 'от источника отказались решением заказчика, его работу выполняет другой канал — какой, указано в столбце причины',
+  },
   not_connected: { label: 'Не подключён', tone: 'neutral', hint: 'ожидает ключ или адрес' },
 };
 
@@ -140,6 +145,10 @@ export const RUN_STATUS: Record<string, { label: string; tone: Tone }> = {
   partial: { label: 'частично', tone: 'attention' },
   failed: { label: 'отказ', tone: 'critical' },
   running: { label: 'выполняется', tone: 'accent' },
+  // Источник закрыт решением заказчика, а сценарий ещё ходит по расписанию,
+  // пока его не выключили. Такой запуск не успех и не отказ: в успешность он
+  // не входит вовсе, но из журнала не пропадает.
+  retired: { label: 'снят с обслуживания', tone: 'neutral' },
 };
 
 export const PERIOD_OPTIONS = [

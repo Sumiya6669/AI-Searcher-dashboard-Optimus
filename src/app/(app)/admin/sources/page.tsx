@@ -33,6 +33,7 @@ export default async function SourcesPage({ searchParams }: { searchParams: Prom
         { value: 'idle', label: 'простаивает' },
         { value: 'disabled', label: 'выключен' },
         { value: 'not_connected', label: 'не подключён' },
+        { value: 'retired', label: 'снят с обслуживания' },
         { value: 'all', label: 'показать все, включая нерабочие' },
       ],
     },
@@ -79,7 +80,7 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
   // Состояние «заблокирован» остаётся в таблице всегда: это работающий процесс,
   // до которого не доходят данные по внешней причине, и именно за этим страница
   // и нужна.
-  const OFF_STATES: SourceFreshness[] = ['disabled', 'not_connected'];
+  const OFF_STATES: SourceFreshness[] = ['disabled', 'not_connected', 'retired'];
   const showAll = state === 'all';
   const rows = showAll
     ? result.data
@@ -92,6 +93,7 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
   const offCount = result.data.length - working.length;
   const notConnected = result.data.filter((s) => !s.connected).length;
   const disabledCount = result.data.filter((s) => s.freshness === 'disabled').length;
+  const retiredCount = result.data.filter((s) => s.freshness === 'retired').length;
   const blockedCount = working.filter((s) => s.freshness === 'blocked').length;
 
   return (
@@ -100,8 +102,9 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
         <CardBody className="space-y-1.5 text-[12.5px] text-[var(--color-ink-2)]">
           <p>
             В таблице — источники, с которых сбор идёт или должен идти. Скрыто {offCount}: выключено{' '}
-            {disabledCount}, ожидают настройки {notConnected}. Их видно через фильтр «показать все, включая
-            нерабочие» — совсем убирать их нельзя, иначе не останется следа, какая часть охвата не работает.
+            {disabledCount}, снято с обслуживания {retiredCount}, ожидают настройки {notConnected}. Их видно
+            через фильтр «показать все, включая нерабочие» — совсем убирать их нельзя, иначе не останется
+            следа, какая часть охвата не работает и чем она заменена.
           </p>
           {blockedCount > 0 ? (
             <p className="text-[var(--color-ink-1)]">

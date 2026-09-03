@@ -212,6 +212,7 @@ export type SourceFreshness =
   | 'active'
   | 'stale'
   | 'blocked'
+  | 'retired'
   | 'error'
   | 'idle'
   | 'disabled'
