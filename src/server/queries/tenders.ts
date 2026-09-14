@@ -1,6 +1,6 @@
 import { DEMO_STOP_WORDS, DEMO_TENDERS } from '../demo/data';
 import { callRpc, db, isDemoMode, safe } from './client';
-import type { Result, StopWordRow, TenderCardRow, TenderUrgency } from '@/lib/types';
+import type { Result, StopWordRow, TenderCardRow, TenderListRow, TenderUrgency } from '@/lib/types';
 
 export interface TenderFilters {
   urgency?: TenderUrgency | 'all';
@@ -14,7 +14,7 @@ export interface TenderFilters {
 }
 
 export interface TenderPage {
-  rows: TenderCardRow[];
+  rows: TenderListRow[];
   total: number;
 }
 
@@ -37,7 +37,12 @@ export async function fetchTenders(filters: TenderFilters): Promise<Result<Tende
 
   return safe(async () => {
     const supabase = await db();
-    let query = supabase.from('v_tender_card').select('*', { count: 'exact' });
+    // Список читает облегчённое представление. В v_tender_card на каждую
+    // строку считаются семь подзапросов и два обращения к справочникам
+    // площадки — в таблице на экране из этого видно одно поле «совпало по».
+    // На второй странице это давало двадцать тысяч обращений к буферам и
+    // упиралось в ограничение на время запроса.
+    let query = supabase.from('v_tender_list').select('*', { count: 'exact' });
 
     if (filters.onlyRelevant !== false) query = query.eq('is_relevant', true);
     if (filters.onlyOpen !== false) query = query.or(`apply_to.is.null,apply_to.gt.${new Date().toISOString()}`);
@@ -73,7 +78,7 @@ export async function fetchTenders(filters: TenderFilters): Promise<Result<Tende
       }
       throw new Error(error.message);
     }
-    return { rows: (data ?? []) as TenderCardRow[], total: count ?? 0 };
+    return { rows: (data ?? []) as TenderListRow[], total: count ?? 0 };
   });
 }
 
@@ -81,7 +86,7 @@ export async function fetchTenders(filters: TenderFilters): Promise<Result<Tende
 /** Только количество, без строк: нужно когда запрошена страница за пределами выборки. */
 async function countOnly(filters: TenderFilters): Promise<{ count: number }> {
   const supabase = await db();
-  let q = supabase.from('v_tender_card').select('tender_id', { count: 'exact', head: true });
+  let q = supabase.from('v_tender_list').select('tender_id', { count: 'exact', head: true });
   if (filters.onlyRelevant !== false) q = q.eq('is_relevant', true);
   if (filters.onlyOpen !== false) q = q.or(`apply_to.is.null,apply_to.gt.${new Date().toISOString()}`);
   if (filters.urgency && filters.urgency !== 'all') q = q.eq('urgency', filters.urgency);
@@ -130,20 +135,20 @@ export async function fetchTenderKpi(): Promise<Result<TenderKpi>> {
 
     const [open, total, amounts, c24, c72] = await Promise.all([
       supabase
-        .from('v_tender_card')
+        .from('v_tender_list')
         .select('tender_id', { count: 'exact', head: true })
         .eq('is_relevant', true)
         .or(`apply_to.is.null,apply_to.gt.${nowIso}`),
-      supabase.from('v_tender_card').select('tender_id', { count: 'exact', head: true }),
-      supabase.from('v_tender_card').select('amount').eq('is_relevant', true).gt('apply_to', nowIso).limit(2000),
+      supabase.from('v_tender_list').select('tender_id', { count: 'exact', head: true }),
+      supabase.from('v_tender_list').select('amount').eq('is_relevant', true).gt('apply_to', nowIso).limit(2000),
       supabase
-        .from('v_tender_card')
+        .from('v_tender_list')
         .select('tender_id', { count: 'exact', head: true })
         .eq('is_relevant', true)
         .gt('apply_to', nowIso)
         .lt('apply_to', in24),
       supabase
-        .from('v_tender_card')
+        .from('v_tender_list')
         .select('tender_id', { count: 'exact', head: true })
         .eq('is_relevant', true)
         .gte('apply_to', in24)

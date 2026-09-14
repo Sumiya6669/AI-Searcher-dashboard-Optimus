@@ -202,6 +202,30 @@ export interface TenderCardRow {
   entity_ids: number[];
 }
 
+/**
+ * Строка списка лотов. Карточка v_tender_card считает на каждую строку семь
+ * коррелированных подзапросов и два обращения к справочникам площадки — в
+ * списке из этого рисуется только «совпало по». Отдельное представление
+ * v_tender_list отдаёт ровно те поля, что есть в таблице на экране, плюс
+ * колонки фильтра и сортировки.
+ */
+export interface TenderListRow {
+  tender_id: number;
+  source: string;
+  lot_no: string;
+  title: string;
+  customer_name: string | null;
+  amount: number | null;
+  apply_to: string | null;
+  portal_status: string | null;
+  is_notified: boolean;
+  importance: number;
+  is_relevant: boolean;
+  hours_left: number | null;
+  urgency: TenderUrgency;
+  matched_on: string | null;
+}
+
 export interface StopWordRow {
   stop_word: string;
   filtered_count: number;
