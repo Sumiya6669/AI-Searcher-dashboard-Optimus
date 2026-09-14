@@ -75,6 +75,9 @@ export async function fetchEvents(filters: EventFilters): Promise<Result<EventPa
         .order('importance', { ascending: false, nullsFirst: false })
         .order('event_date', { ascending: false, nullsFirst: false });
     }
+    // Тот же уникальный ключ в конце сортировки, что и у лотов: важность и
+    // дата события совпадают у десятков записей, и без него страницы плывут.
+    query = query.order('event_id', { ascending: false });
 
     const from = (filters.page - 1) * filters.pageSize;
     const { data, error, count } = await query.range(from, from + filters.pageSize - 1);

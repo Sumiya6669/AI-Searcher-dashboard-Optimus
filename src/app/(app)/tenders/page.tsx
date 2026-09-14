@@ -13,7 +13,7 @@ import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
 import { fetchStopWordStats, fetchTenderKpi, fetchTenders } from '@/server/queries/tenders';
 import type { TenderUrgency } from '@/lib/types';
 
-export const metadata: Metadata = { title: 'Государственные закупки' };
+export const metadata: Metadata = { title: 'Тендеры' };
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 25;
@@ -57,7 +57,7 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Государственные закупки" subtitle="Открытые лоты, требующие внимания" />
+      <PageHeader title="Тендеры" subtitle="Открытые лоты по нашей номенклатуре — со всех площадок, не только государственных" />
 
       <div className="space-y-4">
         <Suspense fallback={<KpiSkeleton count={5} />}>
@@ -152,7 +152,7 @@ async function TenderTable({ params }: { params: SearchParamsInput }) {
       {result.data.rows.length === 0 ? (
         <EmptyState
           title="Подходящих закупок нет"
-          hint="Проверка идёт каждые 15 минут. Лоты ниже порога значимости в базу пишутся, но в этот список не попадают."
+          hint="Проверка идёт каждые 20 минут. Лоты ниже порога суммы и работы без материалов в базу пишутся, но в этот список не попадают."
         />
       ) : (
         <TableWrap>

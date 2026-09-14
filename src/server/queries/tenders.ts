@@ -53,12 +53,44 @@ export async function fetchTenders(filters: TenderFilters): Promise<Result<Tende
     } else {
       query = query.order('apply_to', { ascending: true, nullsFirst: false }).order('importance', { ascending: false });
     }
+    // Ключ лота в конце сортировки обязателен. Срок подачи у лотов часто
+    // совпадает — в одной группе до тридцати трёх штук, а у лотов без срока
+    // он пустой у всех сразу. Без уникального ключа Postgres волен выдавать
+    // такие строки в любом порядке, и тогда вторая страница повторяет часть
+    // первой, а часть лотов не показывается вовсе.
+    query = query.order('tender_id', { ascending: false });
 
     const from = (filters.page - 1) * filters.pageSize;
     const { data, error, count } = await query.range(from, from + filters.pageSize - 1);
-    if (error) throw new Error(error.message);
+    if (error) {
+      // Запрошена страница за пределами выборки: PostgREST отвечает отказом
+      // «range not satisfiable». Так бывает, когда ссылку со страницей
+      // открыли после того, как лоты закрылись. Отдаём пустую страницу и
+      // настоящий размер выборки, чтобы навигация починилась сама.
+      if (/range/i.test(error.message) || error.code === 'PGRST103') {
+        const { count: onlyCount } = await countOnly(filters);
+        return { rows: [], total: onlyCount };
+      }
+      throw new Error(error.message);
+    }
     return { rows: (data ?? []) as TenderCardRow[], total: count ?? 0 };
   });
+}
+
+
+/** Только количество, без строк: нужно когда запрошена страница за пределами выборки. */
+async function countOnly(filters: TenderFilters): Promise<{ count: number }> {
+  const supabase = await db();
+  let q = supabase.from('v_tender_card').select('tender_id', { count: 'exact', head: true });
+  if (filters.onlyRelevant !== false) q = q.eq('is_relevant', true);
+  if (filters.onlyOpen !== false) q = q.or(`apply_to.is.null,apply_to.gt.${new Date().toISOString()}`);
+  if (filters.urgency && filters.urgency !== 'all') q = q.eq('urgency', filters.urgency);
+  if (filters.minAmount) q = q.gte('amount', filters.minAmount);
+  if (filters.query && filters.query.trim().length >= 2) {
+    q = q.like('haystack', `%${filters.query.trim().toLowerCase()}%`);
+  }
+  const { count } = await q;
+  return { count: count ?? 0 };
 }
 
 export async function fetchTenderById(id: number): Promise<Result<TenderCardRow | null>> {

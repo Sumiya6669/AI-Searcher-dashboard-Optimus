@@ -60,7 +60,7 @@ export const NAV: NavGroup[] = [
       { href: '/competitors', label: 'Конкуренты', icon: Building2 },
       { href: '/brands', label: 'Бренды и направления', icon: Tags },
       { href: '/projects', label: 'Проекты', icon: HardHat },
-      { href: '/tenders', label: 'Госзакупки', icon: Gavel },
+      { href: '/tenders', label: 'Тендеры', icon: Gavel },
       { href: '/catalog', label: 'Каталог', icon: Package },
     ],
   },
