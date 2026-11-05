@@ -12,23 +12,32 @@
   фоне сближаются до неразличимости.
 */
 @theme {
+  /* Inter — шрифт фирменного стиля Optimus, грузится через next/font. */
   --font-sans:
-    ui-sans-serif, -apple-system, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    'Inter', ui-sans-serif, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   /* Светлая тема */
-  --color-bg: #f6f7f9;
+  --color-bg: #f8f8f8;
   --color-card: #ffffff;
-  --color-raise: #fbfcfd;
+  --color-raise: #f1f2f4;
   --color-sidebar: #ffffff;
-  --color-ink: #0d1117;
-  --color-ink-2: #4b5566;
-  --color-ink-3: #7b8494;
-  --color-line: #e3e6ec;
-  --color-line-2: #eef0f4;
-  --color-accent: #2563eb;
-  --color-accent-ink: #1d4ed8;
-  --color-soft: #e8effd;
+  --color-ink: #172033;
+  --color-ink-2: #485263;
+  --color-ink-3: #626d7f;
+  --color-line: #dce1e8;
+  --color-line-2: #f1f2f4;
+  --color-accent: #dc2f2f;
+  --color-accent-ink: #c42525;
+  --color-accent-hover: #c42525;
+  --color-on-accent: #ffffff;
+  --color-line-strong: #c3cad4;
+  --color-brand-gray: #75777b;
+  --color-soft-ink: #8f1d1d;
+  /* Опасные действия — бордовый, чтобы не путались с фирменным красным. */
+  --color-danger: #9f1c1c;
+  --color-danger-soft: #fbe3e3;
+  --color-soft: #fdecec;
 
   --color-critical: #d02233;
   --color-warning: #b45c09;
@@ -40,24 +49,31 @@
   --color-attention-soft: #fbf6e1;
   --color-success-soft: #e6f5ee;
 
-  --shadow-card: 0 1px 2px rgb(13 17 23 / 6%);
-  --shadow-pop: 0 8px 24px -6px rgb(13 17 23 / 14%);
+  --shadow-card: 0 1px 2px rgb(23 32 51 / 6%);
+  --shadow-pop: 0 4px 16px rgb(23 32 51 / 12%);
 }
 
 @layer theme {
   .dark {
-    --color-bg: #0a0c10;
-    --color-card: #101319;
-    --color-raise: #151922;
-    --color-sidebar: #0c0f14;
-    --color-ink: #e8edf5;
-    --color-ink-2: #98a3b5;
-    --color-ink-3: #69738a;
-    --color-line: #1e2430;
-    --color-line-2: #171c25;
-    --color-accent: #4d8dff;
-    --color-accent-ink: #85b0ff;
-    --color-soft: #14203a;
+    --color-bg: #121418;
+    --color-card: #1a1d23;
+    --color-raise: #22262e;
+    --color-sidebar: #121418;
+    --color-ink: #eceef2;
+    --color-ink-2: #b5bcc8;
+    --color-ink-3: #8f98a8;
+    --color-line: #2d323c;
+    --color-line-2: #22262e;
+    --color-accent: #ff6b66;
+    --color-accent-ink: #ff8782;
+    --color-accent-hover: #ff8782;
+    --color-on-accent: #2b0908;
+    --color-line-strong: #414856;
+    --color-brand-gray: #98999b;
+    --color-soft-ink: #ffb4b0;
+    --color-danger: #ff8a85;
+    --color-danger-soft: #3d1618;
+    --color-soft: #3a1517;
 
     --color-critical: #ff5f6d;
     --color-warning: #ff9f38;
@@ -69,8 +85,8 @@
     --color-attention-soft: #262009;
     --color-success-soft: #06231a;
 
-    --shadow-card: 0 1px 0 rgb(255 255 255 / 3%) inset;
-    --shadow-pop: 0 16px 40px -12px rgb(0 0 0 / 70%);
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow-pop: 0 4px 16px rgb(0 0 0 / 50%);
   }
 }
 

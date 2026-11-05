@@ -5,8 +5,8 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'AI MultiSystem',
-    template: '%s · AI MultiSystem',
+    default: 'Optimus Eye',
+    template: '%s · Optimus Eye',
   },
   description: 'Мониторинг отрасли, конкурентов и государственных закупок — Optimus-kz',
   robots: { index: false, follow: false },
@@ -28,6 +28,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ru" className={forcedLight ? undefined : 'dark'} suppressHydrationWarning>
       <head>
+        {/*
+          Inter — шрифт фирменного стиля Optimus. Подключён ссылкой, а не
+          через next/font: next/font забирает файлы шрифта в момент сборки,
+          и сборка начинает зависеть от доступности Google Fonts. Один
+          недоступный хост — и выкладка не собирается вовсе.
+        */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        />
         {/*
           Тема применяется до первой отрисовки. Иначе при выборе «как в системе»
           страница успевает мигнуть светлой на тёмном экране.

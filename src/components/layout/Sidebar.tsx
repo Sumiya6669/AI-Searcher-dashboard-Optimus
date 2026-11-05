@@ -25,6 +25,7 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
 import type { AppRole } from '@/lib/types';
+import { Logo } from './Logo';
 
 interface NavItem {
   href: string;
@@ -144,12 +145,11 @@ export function SidebarNav({ role, onNavigate }: { role: AppRole; onNavigate?: (
 export function SidebarBrand({ children }: { children?: ReactNode }) {
   return (
     <div className="flex h-14 items-center gap-2.5 border-b border-[var(--color-line)] px-4">
-      <span className="flex size-7 items-center justify-center rounded-lg bg-[var(--color-accent)] text-[11px] font-bold text-white">
-        AI
-      </span>
       <span className="min-w-0">
-        <span className="block truncate text-[13.5px] font-semibold leading-4 tracking-[-0.01em]">AI MultiSystem</span>
-        <span className="block truncate text-[11px] leading-4 text-[var(--color-ink-3)]">Optimus-kz</span>
+        <Logo />
+        <span className="mt-0.5 block truncate text-[11px] leading-4 text-[var(--color-ink-3)]">
+          Мониторинг отрасли · Optimus-kz
+        </span>
       </span>
       {children}
     </div>
