@@ -8,6 +8,7 @@ import { Card, CardBody, CardHead, PageHeader } from '@/components/ui/Card';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { Td, Th, TableWrap, Tr } from '@/components/ui/Table';
 import { formatNumber } from '@/lib/format';
+import { sortRows } from '@/lib/sort';
 import { fetchCatalogGroups, fetchCatalogItems, fetchCatalogTotals } from '@/server/queries/analysis';
 
 export const metadata: Metadata = { title: 'Каталог' };
@@ -21,6 +22,7 @@ export default async function CatalogPage({
   const sp = await searchParams;
   const query = typeof sp.q === 'string' ? sp.q : '';
   const category = typeof sp.group === 'string' && sp.group !== '' ? sp.group : null;
+  const sort = typeof sp.sort === 'string' ? sp.sort : undefined;
 
   const [groups, totals, items] = await Promise.all([
     fetchCatalogGroups(),
@@ -163,11 +165,19 @@ export default async function CatalogPage({
             <TableWrap>
                 <thead>
                   <tr>
-                    <Th>Артикул</Th>
-                    <Th>Наименование</Th>
-                    <Th>Бренд</Th>
+                    <Th ascFirst sortKey="sku" currentSort={sort} params={sp}>
+                      Артикул
+                    </Th>
+                    <Th ascFirst sortKey="name" currentSort={sort} params={sp}>
+                      Наименование
+                    </Th>
+                    <Th ascFirst sortKey="brand" currentSort={sort} params={sp}>
+                      Бренд
+                    </Th>
                     <Th>Линейка</Th>
-                    <Th numeric>Фасовка</Th>
+                    <Th numeric sortKey="pack" currentSort={sort} params={sp}>
+                      Фасовка
+                    </Th>
                     <Th>Цвет</Th>
                     <Th>База</Th>
                     <Th>Блеск</Th>
@@ -175,7 +185,12 @@ export default async function CatalogPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {items.data.map((it) => (
+                  {sortRows(items.data, sort, {
+                    sku: (it) => it.sku,
+                    name: (it) => it.name,
+                    brand: (it) => it.brand_name,
+                    pack: (it) => it.pack_size,
+                  }).map((it) => (
                     <Tr key={it.id}>
                       <Td className="tabular text-[var(--color-ink-2)]">
                         {it.sku ?? '—'}

@@ -12,6 +12,7 @@ import { formatInterval } from '@/lib/interval';
 import { formatNumber, formatPercent, formatRelative, truncate } from '@/lib/format';
 import type { SourceFreshness } from '@/lib/types';
 import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
+import { sortRows } from '@/lib/sort';
 import { fetchSourceStats } from '@/server/queries/sources';
 
 export const metadata: Metadata = { title: 'Источники и сбор' };
@@ -88,6 +89,14 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
       ? result.data.filter((s) => s.freshness === state)
       : result.data.filter((s) => !OFF_STATES.includes(s.freshness));
 
+  const sort = readParam(params, 'sort');
+  const sorted = sortRows(rows, sort, {
+    name: (s) => s.name,
+    materials: (s) => s.materials_period,
+    events: (s) => s.events_period,
+    date: (s) => s.last_activity_at,
+  });
+
   const working = result.data.filter((s) => !OFF_STATES.includes(s.freshness));
   const maxShare = Math.max(1, ...working.map((s) => s.share_pct));
   const offCount = result.data.length - working.length;
@@ -124,17 +133,25 @@ async function SourceTable({ params }: { params: SearchParamsInput }) {
         <TableWrap>
           <thead>
             <tr>
-              <Th>Источник</Th>
-              <Th numeric>Материалов</Th>
+              <Th ascFirst sortKey="name" currentSort={sort} params={params}>
+                Источник
+              </Th>
+              <Th numeric sortKey="materials" currentSort={sort} params={params}>
+                Материалов
+              </Th>
               <Th>Доля</Th>
-              <Th numeric>Событий</Th>
+              <Th numeric sortKey="events" currentSort={sort} params={params}>
+                Событий
+              </Th>
               <Th>Состояние</Th>
-              <Th>Последнее обновление</Th>
+              <Th sortKey="date" currentSort={sort} params={params}>
+                Последнее обновление
+              </Th>
               <Th>Что мешает</Th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((source) => (
+            {sorted.map((source) => (
               <Tr key={source.code}>
                 <LinkCell href={`/admin/sources/${source.code}`}>
                   {source.name}

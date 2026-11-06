@@ -25,6 +25,7 @@ export function Th({
   currentSort,
   params,
   width,
+  ascFirst,
 }: {
   children: ReactNode;
   numeric?: boolean;
@@ -33,6 +34,12 @@ export function Th({
   currentSort?: string;
   params?: SearchParamsInput;
   width?: string;
+  /**
+   * Куда ведёт первое нажатие. У чисел и дат осмысленно начинать с убывания
+   * (сверху самое крупное и самое свежее), у названий — с возрастания: список
+   * от «Я» к «А» человек не просит никогда.
+   */
+  ascFirst?: boolean;
 }) {
   const base = cn(
     'sticky top-0 z-10 border-b border-[var(--color-line)] bg-[var(--color-card)] px-3 pb-2 pt-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--color-ink-3)]',
@@ -50,7 +57,8 @@ export function Th({
 
   const isActive = currentSort === sortKey || currentSort === `-${sortKey}`;
   const isDesc = currentSort === `-${sortKey}`;
-  const next = isActive && isDesc ? sortKey : `-${sortKey}`;
+  const first = ascFirst ? sortKey : `-${sortKey}`;
+  const next = isActive ? (isDesc ? sortKey : `-${sortKey}`) : first;
 
   return (
     <th scope="col" className={base} style={width ? { width } : undefined} aria-sort={isActive ? (isDesc ? 'descending' : 'ascending') : 'none'}>

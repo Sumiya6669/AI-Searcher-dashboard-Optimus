@@ -9,6 +9,7 @@ import { LinkCell, TableWrap, Td, Th, Tr } from '@/components/ui/Table';
 import { CHANGE_TYPE_LABEL, PERIOD_OPTIONS } from '@/lib/domain';
 import { formatNumber, formatPercent, formatShort, hostOf } from '@/lib/format';
 import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
+import { sortRows } from '@/lib/sort';
 import { fetchCompetitorActivity } from '@/server/queries/competitors';
 
 export const metadata: Metadata = { title: 'Конкуренты' };
@@ -68,11 +69,22 @@ async function CompetitorTable({ params }: { params: SearchParamsInput }) {
   if (health) rows = rows.filter((r) => r.crawl_health === health);
   if (query) rows = rows.filter((r) => r.name.toLowerCase().includes(query));
 
+  // Отбор отработал — теперь порядок. Это разные вещи: фильтр решает, кто
+  // попадёт в список, сортировка — в каком порядке их читать.
+  const sort = readParam(params, 'sort');
+  rows = sortRows(rows, sort ?? '-changes', {
+    name: (r) => r.name,
+    events: (r) => r.events_count,
+    changes: (r) => r.changes_count,
+    date: (r) => r.last_change_at,
+    crawl: (r) => r.crawl_success_pct,
+  });
+
   return (
     <Card>
       <CardHead
         title={`Конкурентов под наблюдением: ${formatNumber(rows.length)}`}
-        hint="порядок по числу изменений за период, не по алфавиту"
+        hint="нажмите на заголовок столбца, чтобы изменить порядок"
       />
       {rows.length === 0 ? (
         <EmptyState title="Под эти условия конкуренты не подходят" hint="Сбросьте фильтры или увеличьте период." />
@@ -80,12 +92,22 @@ async function CompetitorTable({ params }: { params: SearchParamsInput }) {
         <TableWrap>
           <thead>
             <tr>
-              <Th>Конкурент</Th>
-              <Th numeric>Событий</Th>
-              <Th numeric>Изменений</Th>
+              <Th ascFirst sortKey="name" currentSort={sort} params={params}>
+                Конкурент
+              </Th>
+              <Th numeric sortKey="events" currentSort={sort} params={params}>
+                Событий
+              </Th>
+              <Th numeric sortKey="changes" currentSort={sort ?? '-changes'} params={params}>
+                Изменений
+              </Th>
               <Th>Что менялось</Th>
-              <Th>Последнее изменение</Th>
-              <Th numeric>Обход</Th>
+              <Th sortKey="date" currentSort={sort} params={params}>
+                Последнее изменение
+              </Th>
+              <Th numeric sortKey="crawl" currentSort={sort} params={params}>
+                Обход
+              </Th>
               <Th>Состояние</Th>
             </tr>
           </thead>

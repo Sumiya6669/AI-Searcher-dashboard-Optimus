@@ -10,6 +10,7 @@ import { LinkCell, TableWrap, Td, Th, Tr } from '@/components/ui/Table';
 import { ENTITY_TYPE_LABEL, PERIOD_OPTIONS, RELATION_LABEL } from '@/lib/domain';
 import { formatNumber, formatPercent, formatShort } from '@/lib/format';
 import { readInt, readParam, type SearchParamsInput } from '@/lib/url';
+import { sortRows } from '@/lib/sort';
 import { fetchBrandStats } from '@/server/queries/brands';
 
 export const metadata: Metadata = { title: 'Бренды и направления' };
@@ -91,6 +92,14 @@ async function BrandTable({ params }: { params: SearchParamsInput }) {
   if (zero === 'none') rows = rows.filter((r) => r.events_count === 0);
   if (query) rows = rows.filter((r) => r.canonical_name.toLowerCase().includes(query));
 
+  const sort = readParam(params, 'sort');
+  rows = sortRows(rows, sort ?? '-events', {
+    name: (r) => r.canonical_name,
+    events: (r) => r.events_count,
+    high: (r) => r.events_high,
+    date: (r) => r.last_event_at,
+  });
+
   const gaps = rows.filter((r) => r.coverage_gap).length;
   const zeros = rows.filter((r) => r.events_count === 0).length;
   const maxShare = Math.max(1, ...rows.map((r) => r.share_pct));
@@ -108,7 +117,7 @@ async function BrandTable({ params }: { params: SearchParamsInput }) {
       <Card>
         <CardHead
           title={`Сущностей в выборке: ${formatNumber(rows.length)}`}
-          hint="порядок по числу событий за период"
+          hint="нажмите на заголовок столбца, чтобы изменить порядок"
         />
         {rows.length === 0 ? (
           <EmptyState title="Под эти условия ничего не подходит" hint="Сбросьте фильтры." />
@@ -116,14 +125,23 @@ async function BrandTable({ params }: { params: SearchParamsInput }) {
           <TableWrap>
             <thead>
               <tr>
-                <Th>Бренд или тема</Th>
+                <Th ascFirst sortKey="name" currentSort={sort} params={params}>
+                  Бренд или тема
+                </Th>
                 <Th>Тип</Th>
                 <Th>Группа</Th>
-                <Th numeric>Событий</Th>
+                <Th numeric sortKey="events" currentSort={sort ?? '-events'} params={params}>
+                  Событий
+                </Th>
+                <Th numeric sortKey="high" currentSort={sort} params={params}>
+                  Важных
+                </Th>
                 <Th>Доля потока</Th>
                 <Th>Тональность</Th>
                 <Th>Кому уходит</Th>
-                <Th>Последнее</Th>
+                <Th sortKey="date" currentSort={sort} params={params}>
+                  Последнее
+                </Th>
               </tr>
             </thead>
             <tbody>
@@ -143,11 +161,14 @@ async function BrandTable({ params }: { params: SearchParamsInput }) {
                   <Td className="whitespace-nowrap text-[var(--color-ink-2)]">{row.product_group ?? '—'}</Td>
                   <Td numeric className={row.events_count === 0 ? 'text-[var(--color-ink-3)]' : undefined}>
                     {formatNumber(row.events_count)}
-                    {row.events_high > 0 ? (
-                      <span className="block text-[11.5px] font-normal text-[var(--color-warning)]">
-                        важных {row.events_high}
-                      </span>
-                    ) : null}
+                  </Td>
+                  <Td
+                    numeric
+                    className={
+                      row.events_high > 0 ? 'text-[var(--color-warning)]' : 'text-[var(--color-ink-3)]'
+                    }
+                  >
+                    {row.events_high > 0 ? formatNumber(row.events_high) : '—'}
                   </Td>
                   <Td className="w-28">
                     <Bar value={(row.share_pct / maxShare) * 100} />

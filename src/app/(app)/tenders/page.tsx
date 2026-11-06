@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
-import { UrgencyBadge } from '@/components/domain/Badges';
+import { SeverityBadge, UrgencyBadge } from '@/components/domain/Badges';
 import { FilterBar, type FilterField } from '@/components/domain/FilterBar';
 import { KpiRow } from '@/components/domain/KpiCard';
 import { Card, CardBody, CardHead, PageHeader } from '@/components/ui/Card';
@@ -17,6 +17,17 @@ export const metadata: Metadata = { title: 'Тендеры' };
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 25;
+
+/** Подпись под заголовком проговаривает текущий порядок словами. */
+const TENDER_SORT_HINT: Record<string, string> = {
+  '': 'порядок по сроку закрытия приёма заявок — самые срочные сверху',
+  deadline: 'порядок по сроку закрытия приёма заявок — самые срочные сверху',
+  '-deadline': 'порядок по сроку закрытия — сначала те, до которых дальше всего',
+  amount: 'порядок по сумме — сначала самые мелкие лоты',
+  '-amount': 'порядок по сумме — сначала самые крупные лоты',
+  importance: 'порядок по важности — сначала фоновое',
+  '-importance': 'порядок по важности — сначала то, что ближе к нашему профилю',
+};
 
 export default async function TendersPage({ searchParams }: { searchParams: Promise<SearchParamsInput> }) {
   const params = await searchParams;
@@ -147,7 +158,7 @@ async function TenderTable({ params }: { params: SearchParamsInput }) {
     <Card>
       <CardHead
         title={`Лотов в выборке: ${formatNumber(result.data.total)}`}
-        hint="порядок по сроку закрытия приёма заявок — самые срочные сверху"
+        hint={TENDER_SORT_HINT[readParam(params, 'sort') ?? ''] ?? 'порядок задан вручную'}
       />
       {result.data.rows.length === 0 ? (
         <EmptyState
@@ -165,9 +176,14 @@ async function TenderTable({ params }: { params: SearchParamsInput }) {
               <Th numeric sortKey="amount" currentSort={readParam(params, 'sort')} params={params}>
                 Сумма
               </Th>
+              <Th sortKey="importance" currentSort={readParam(params, 'sort')} params={params}>
+                Важность
+              </Th>
               <Th>Заказчик</Th>
               <Th>Совпало по</Th>
-              <Th>Дата закрытия</Th>
+              <Th sortKey="deadline" currentSort={readParam(params, 'sort') ?? 'deadline'} params={params}>
+                Дата закрытия
+              </Th>
               <Th>Статус</Th>
             </tr>
           </thead>
@@ -184,6 +200,9 @@ async function TenderTable({ params }: { params: SearchParamsInput }) {
                   </span>
                 </LinkCell>
                 <Td numeric>{formatMoneyKzt(tender.amount)}</Td>
+                <Td className="whitespace-nowrap">
+                  <SeverityBadge level={tender.importance} compact />
+                </Td>
                 <Td className="max-w-52 text-[var(--color-ink-2)]">{tender.customer_name ?? '—'}</Td>
                 <Td className="max-w-52 text-[12.5px] text-[var(--color-ink-2)]">{tender.matched_on ?? '—'}</Td>
                 <Td className="whitespace-nowrap text-[var(--color-ink-2)]">{formatDateTime(tender.apply_to)}</Td>

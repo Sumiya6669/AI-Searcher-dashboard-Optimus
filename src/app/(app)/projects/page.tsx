@@ -5,8 +5,11 @@ import Link from 'next/link';
 import { ConfidenceBadge, PriorityBadge } from '@/components/domain/Analysis';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardBody, CardHead, PageHeader } from '@/components/ui/Card';
+import { SortBar } from '@/components/ui/SortBar';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { formatDate, formatNumber, plural } from '@/lib/format';
+import { readParam, type SearchParamsInput } from '@/lib/url';
+import { sortRows } from '@/lib/sort';
 import { fetchProjects, fetchStages } from '@/server/queries/analysis';
 
 export const metadata: Metadata = { title: 'Проекты' };
@@ -20,7 +23,8 @@ const STATUS_LABEL: Record<string, string> = {
   lost: 'упущен',
 };
 
-export default async function ProjectsPage() {
+export default async function ProjectsPage({ searchParams }: { searchParams: Promise<SearchParamsInput> }) {
+  const params = await searchParams;
   const [projects, stages] = await Promise.all([fetchProjects(), fetchStages()]);
 
   if (!projects.ok) {
@@ -34,7 +38,13 @@ export default async function ProjectsPage() {
     );
   }
 
-  const rows = projects.data;
+  // Порядок по умолчанию — вес объекта по убыванию: наверху стройки, где
+  // материал ещё не выбран и успеть можно. Выбранный порядок берётся из
+  // адреса, как и на остальных вкладках.
+  const rows = sortRows(projects.data, readParam(params, 'sort') ?? '-score', {
+    score: (r) => r.total_score,
+    date: (r) => r.updated_at,
+  });
   const hot = rows.filter((r) => r.priority === 'critical' || r.priority === 'high').length;
 
   return (
@@ -67,6 +77,20 @@ export default async function ProjectsPage() {
             </p>
           </CardBody>
         </Card>
+
+        {rows.length > 0 ? (
+          <Card>
+            <SortBar
+              className="border-b-0"
+              params={params}
+              fallback="-score"
+              options={[
+                { key: 'score', label: 'Важность' },
+                { key: 'date', label: 'Дата обновления' },
+              ]}
+            />
+          </Card>
+        ) : null}
 
         {rows.length === 0 ? (
           <Card>

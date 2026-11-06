@@ -5,6 +5,7 @@ import { EventFeed } from '@/components/domain/EventFeed';
 import { FilterBar, type FilterField } from '@/components/domain/FilterBar';
 import { Card, CardHead, PageHeader } from '@/components/ui/Card';
 import { ErrorState, LoadingSkeleton } from '@/components/ui/States';
+import { SortBar } from '@/components/ui/SortBar';
 import { Pagination } from '@/components/ui/Table';
 import { AGENT_LABEL, PERIOD_OPTIONS, SEVERITY_OPTIONS, severityFromParam } from '@/lib/domain';
 import { formatNumber } from '@/lib/format';
@@ -15,6 +16,15 @@ export const metadata: Metadata = { title: 'События' };
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 25;
+
+/** Подпись под заголовком объясняет текущий порядок словами, а не стрелкой. */
+const SORT_HINT: Record<string, string> = {
+  '': 'порядок: важность по убыванию, затем свежесть',
+  '-importance': 'порядок: важность по убыванию, затем свежесть',
+  importance: 'порядок: сначала фоновое, важное в конце',
+  '-date': 'порядок: сначала самое свежее',
+  date: 'порядок: сначала самое давнее',
+};
 
 export default async function EventsPage({ searchParams }: { searchParams: Promise<SearchParamsInput> }) {
   const params = await searchParams;
@@ -97,7 +107,15 @@ async function EventsBlock({ params }: { params: SearchParamsInput }) {
     <Card>
       <CardHead
         title={`Найдено событий: ${formatNumber(result.data.total)}`}
-        hint="порядок: важность по убыванию, затем свежесть"
+        hint={SORT_HINT[readParam(params, 'sort') ?? ''] ?? 'порядок: важность по убыванию, затем свежесть'}
+      />
+      <SortBar
+        params={params}
+        fallback="-importance"
+        options={[
+          { key: 'importance', label: 'Важность' },
+          { key: 'date', label: 'Дата' },
+        ]}
       />
       <EventFeed events={result.data.rows} />
       {result.data.total > PAGE_SIZE ? (
